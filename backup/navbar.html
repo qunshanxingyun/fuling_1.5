@@ -1,0 +1,138 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+    <div class="container">
+        <!-- Logo和品牌名 -->
+        <a class="navbar-brand fw-bold" href="{{ url_for('pages.index') }}">
+            <i class="fas fa-seedling me-2"></i>
+            茯苓靶点预测数据库
+        </a>
+        
+        <!-- 移动端菜单按钮 -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- 导航菜单 -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('pages.index') }}">
+                        <i class="fas fa-home me-1"></i>首页
+                    </a>
+                </li>
+                
+                <!-- 化合物模块 -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-atom me-1"></i>化合物
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ url_for('compounds_view.compounds_list') }}">
+                            <i class="fas fa-list me-2"></i>化合物列表
+                        </a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('compounds_view.compounds_search') }}">
+                            <i class="fas fa-search me-2"></i>化合物搜索
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ url_for('compounds_view.compounds_by_type', compound_type='挥发油') }}">
+                            <i class="fas fa-flask me-2"></i>挥发油类
+                        </a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('compounds_view.compounds_by_type', compound_type='三萜') }}">
+                            <i class="fas fa-ring me-2"></i>三萜类
+                        </a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('compounds_view.compounds_by_type', compound_type='甾醇') }}">
+                            <i class="fas fa-capsules me-2"></i>甾醇类
+                        </a></li>
+                    </ul>
+                </li>
+                
+                <!-- 靶点模块 -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-bullseye me-1"></i>靶点
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ url_for('targets_view.targets_list') }}">
+                            <i class="fas fa-list me-2"></i>靶点列表
+                        </a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('targets_view.targets_list') }}">
+                            <i class="fas fa-search me-2"></i>靶点搜索
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ url_for('targets_view.targets_by_family', family='UGT') }}">
+                            <i class="fas fa-dna me-2"></i>UGT家族
+                        </a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('targets_view.targets_by_family', family='CYP450') }}">
+                            <i class="fas fa-cog me-2"></i>CYP450家族
+                        </a></li>
+                    </ul>
+                </li>
+                
+                <!-- 分析模块 -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-chart-bar me-1"></i>分析
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ url_for('pages.statistics_page') }}">
+                            <i class="fas fa-chart-pie me-2"></i>统计分析
+                        </a></li>
+                        <li><a class="dropdown-item" href="#" onclick="showComingSoon()">
+                            <i class="fas fa-project-diagram me-2"></i>网络图谱
+                        </a></li>
+                        <li><a class="dropdown-item" href="#" onclick="showComingSoon()">
+                            <i class="fas fa-cube me-2"></i>3D可视化
+                        </a></li>
+                    </ul>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('pages.help_page') }}">
+                        <i class="fas fa-question-circle me-1"></i>帮助
+                    </a>
+                </li>
+            </ul>
+            
+            <!-- 搜索框 -->
+            <form class="d-flex me-3" role="search">
+                <div class="input-group">
+                    <input class="form-control form-control-sm" type="search" placeholder="搜索化合物或靶点..." id="globalSearch">
+                    <button class="btn btn-outline-light btn-sm" type="button" onclick="performGlobalSearch()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+            
+            <!-- API文档链接 -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/api" target="_blank">
+                        <i class="fas fa-code me-1"></i>API
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<script>
+// 全局搜索功能
+function performGlobalSearch() {
+    const query = document.getElementById('globalSearch').value.trim();
+    if (query) {
+        window.location.href = `{{ url_for('pages.search_page') }}?q=${encodeURIComponent(query)}`;
+    }
+}
+
+// 回车键搜索
+document.getElementById('globalSearch').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        performGlobalSearch();
+    }
+});
+
+// 即将推出提示
+function showComingSoon() {
+    alert('该功能即将推出，敬请期待！');
+}
+</script>

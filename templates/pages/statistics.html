@@ -1,0 +1,368 @@
+{% extends "base/base.html" %}
+
+{% block title %}Database Statistics - Poria Cocos Target Prediction Database{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('pages.index') }}">Home</a></li>
+                    <li class="breadcrumb-item active">Statistics</li>
+                </ol>
+            </nav>
+            
+            <div class="text-center">
+                <h1 class="display-5 mb-3">
+                    <i class="fas fa-chart-bar text-primary me-2"></i>
+                    Database Statistics
+                </h1>
+                <p class="lead text-muted mb-4">
+                    Comprehensive statistical analysis of <em>Poria cocos</em> compound and target prediction data
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Database Summary Section -->
+    <section id="summary" class="mb-5">
+        <h2 class="mb-4">
+            <i class="fas fa-database text-primary me-2"></i>
+            Database Summary
+        </h2>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-atom fa-3x text-primary"></i>
+                        </div>
+                        <h3 class="display-6 fw-bold text-primary">151</h3>
+                        <p class="text-muted mb-0">Active Compounds</p>
+                        <small class="text-muted">From <em>Poria cocos</em></small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-bullseye fa-3x text-success"></i>
+                        </div>
+                        <h3 class="display-6 fw-bold text-success">1,885</h3>
+                        <p class="text-muted mb-0">Predicted Targets</p>
+                        <small class="text-muted">Human proteins</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-link fa-3x text-info"></i>
+                        </div>
+                        <h3 class="display-6 fw-bold text-info">21,488</h3>
+                        <p class="text-muted mb-0">High-Confidence Interactions</p>
+                        <small class="text-muted">Prediction score ≥ 0.95</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Compound Analysis Section -->
+    <section id="compounds" class="mb-5">
+        <h2 class="mb-4">
+            <i class="fas fa-flask text-primary me-2"></i>
+            Compound Analysis
+        </h2>
+        
+        <div class="row g-4">
+            <!-- Compound Distribution -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-light">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-chart-pie me-2"></i>
+                            Compound Type Distribution
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center mb-4">
+                            <div class="col-4">
+                                <div class="p-3 bg-success bg-opacity-10 rounded">
+                                    <div class="display-6 fw-bold text-success">32</div>
+                                    <small class="text-muted">Essential Oils</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-3 bg-info bg-opacity-10 rounded">
+                                    <div class="display-6 fw-bold text-info">102</div>
+                                    <small class="text-muted">Triterpenes</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-3 bg-warning bg-opacity-10 rounded">
+                                    <div class="display-6 fw-bold text-warning">17</div>
+                                    <small class="text-muted">Sterols</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Progress bar with hardcoded values -->
+                        <div class="mb-2">
+                            <small class="text-muted">Distribution:</small>
+                            <div class="progress mt-1" style="height: 12px;">
+                                <div class="progress-bar bg-success" style="width: 21.2%"></div>
+                                <div class="progress-bar bg-info" style="width: 67.5%"></div>
+                                <div class="progress-bar bg-warning" style="width: 11.3%"></div>
+                            </div>
+                            <div class="row text-center mt-2">
+                                <div class="col-4">
+                                    <small class="text-success">21.2%</small>
+                                </div>
+                                <div class="col-4">
+                                    <small class="text-info">67.5%</small>
+                                </div>
+                                <div class="col-4">
+                                    <small class="text-warning">11.3%</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Completeness -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-light">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Data Completeness
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">SMILES Structures</span>
+                                <span class="fw-semibold">151/151</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-success" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">PubChem IDs</span>
+                                <span class="fw-semibold">91/151</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-info" style="width: 60.3%"></div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info mb-0">
+                            <small>
+                                <i class="fas fa-info-circle me-1"></i>
+                                Data completeness indicates the availability of structural and reference information for compounds.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Target Analysis Section -->
+    <section id="targets" class="mb-5">
+        <h2 class="mb-4">
+            <i class="fas fa-bullseye text-success me-2"></i>
+            Target Analysis
+        </h2>
+        
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Target Prediction Overview
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="border-end">
+                                    <h4 class="text-primary mb-1">1,885</h4>
+                                    <small class="text-muted">Total Targets</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="border-end">
+                                    <h4 class="text-success mb-1">21,488</h4>
+                                    <small class="text-muted">Interactions</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="border-end">
+                                    <h4 class="text-info mb-1">≥ 0.95</h4>
+                                    <small class="text-muted">Confidence Score</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <h4 class="text-warning mb-1">DrugBAN</h4>
+                                <small class="text-muted">AI Model</small>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="text-center">
+                            <p class="text-muted mb-3">
+                                Predictions generated using the DrugBAN deep learning model with bilinear attention mechanism
+                            </p>
+                            <div class="d-flex justify-content-center gap-3">
+                                <a href="{{ url_for('targets_view.targets_list') }}" class="btn btn-outline-success">
+                                    <i class="fas fa-list me-1"></i>Browse All Targets
+                                </a>
+                                <a href="{{ url_for('pages.help_page') }}" class="btn btn-outline-info">
+                                    <i class="fas fa-question-circle me-1"></i>Learn About DrugBAN
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Data Quality Section -->
+    <section id="quality" class="mb-5">
+        <h2 class="mb-4">
+            <i class="fas fa-shield-alt text-info me-2"></i>
+            Data Quality & Methodology
+        </h2>
+        
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-light">
+                        <h5 class="card-title mb-0">Quality Metrics</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <strong>High Confidence Threshold:</strong> ≥ 0.95
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <strong>Structure Validation:</strong> RDKit verified
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <strong>Target Coverage:</strong> 4,759 human proteins screened
+                            </li>
+                            <li class="mb-0">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <strong>Literature Validation:</strong> Manually curated
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-light">
+                        <h5 class="card-title mb-0">Methodology</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-brain text-primary me-2"></i>
+                                <strong>AI Model:</strong> DrugBAN (Bilinear Attention Network)
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-database text-info me-2"></i>
+                                <strong>Training Data:</strong> BindingDB, TCMSP
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-cogs text-warning me-2"></i>
+                                <strong>Features:</strong> GCN + CNN with attention
+                            </li>
+                            <li class="mb-0">
+                                <i class="fas fa-chart-line text-success me-2"></i>
+                                <strong>Enrichment:</strong> GO + KEGG analysis
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section id="actions" class="mb-5">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-rocket me-2"></i>
+                    Explore the Database
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <a href="{{ url_for('compounds_view.compounds_list') }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-atom me-1"></i>Browse Compounds
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('targets_view.targets_list') }}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-bullseye me-1"></i>Browse Targets
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('pages.search_page') }}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-search me-1"></i>Search Database
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="/api" class="btn btn-outline-dark w-100">
+                            <i class="fas fa-code me-1"></i>API Access
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Simple smooth scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

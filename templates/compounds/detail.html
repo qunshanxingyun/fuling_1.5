@@ -1,0 +1,455 @@
+{% extends "base/base.html" %}
+
+{% block title %}
+{% if compound %}
+{{ compound.chinese_name or compound.Name or 'Compound' }} - Compound Details
+{% else %}
+Compound Details - Poria Cocos Target Prediction Database
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    {% if error %}
+    <!-- Error Page -->
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-danger">
+                <h4 class="alert-heading">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Loading Failed
+                </h4>
+                <p class="mb-0">{{ error }}</p>
+                <hr>
+                <a href="{{ url_for('compounds_view.compounds_list') }}" class="btn btn-outline-danger">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Compounds
+                </a>
+            </div>
+        </div>
+    </div>
+    {% elif compound %}
+    
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('pages.index') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('compounds_view.compounds_list') }}">Compounds</a></li>
+            <li class="breadcrumb-item active">{{ compound.chinese_name or compound.Name or 'ID: ' + compound.global_id|string }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Left Side: Compound Information -->
+        <div class="col-lg-8">
+            <!-- Basic Information Card - Improved Design -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-gradient-primary text-white">
+                    <div class="d-flex align-items-center">
+                        <div class="compound-icon me-3">
+                            <i class="fas fa-atom fa-2x"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h3 class="card-title mb-1 fw-bold">
+                                {{ compound.chinese_name or 'Unnamed Compound' }}
+                            </h3>
+                            {% if compound.Name and compound.Name != compound.chinese_name %}
+                            <p class="mb-0 opacity-90">{{ compound.Name }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="compound-type-badge">
+                            <span class="badge bg-light text-dark fs-6 px-3 py-2">
+                                <i class="fas fa-{% if compound.compound_type == '挥发油' %}wind{% elif compound.compound_type == '三萜' %}leaf{% else %}ring{% endif %} me-2"></i>
+                                {% if compound.compound_type == '挥发油' %}Essential Oils
+                                {% elif compound.compound_type == '三萜' %}Triterpenes
+                                {% elif compound.compound_type == '甾醇' %}Sterols
+                                {% else %}{{ compound.compound_type }}{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <!-- Global ID Section -->
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-fingerprint text-primary"></i>
+                                </div>
+                                <div class="info-content">
+                                    <label class="info-label">Global ID</label>
+                                    <div class="info-value">
+                                        <span class="badge bg-primary fs-6 px-3 py-2">ID-{{ compound.global_id }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PubChem CID Section -->
+                        {% if compound.Compound_CID %}
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-database text-success"></i>
+                                </div>
+                                <div class="info-content">
+                                    <label class="info-label">PubChem CID</label>
+                                    <div class="info-value">
+                                        <a href="https://pubchem.ncbi.nlm.nih.gov/compound/{{ compound.Compound_CID | int }}" 
+                                        target="_blank" class="btn btn-outline-success btn-sm">
+                                            <span class="fw-bold">{{ compound.Compound_CID | int }}</span>
+                                            <i class="fas fa-external-link-alt ms-2"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        
+                    </div>
+                </div>
+            </div>
+
+            <style>
+            /* Custom styles for improved compound card */
+            .bg-gradient-primary {
+                background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+            }
+
+            .info-item {
+                display: flex;
+                align-items: center;
+                padding: 1rem;
+                background: var(--gray-50);
+                border-radius: var(--radius-lg);
+                border-left: 4px solid var(--primary-500);
+                transition: all 0.2s ease;
+            }
+
+            .info-item:hover {
+                background: white;
+                box-shadow: var(--shadow-md);
+                transform: translateY(-1px);
+            }
+
+            .info-icon {
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: white;
+                border-radius: 50%;
+                margin-right: 1rem;
+                box-shadow: var(--shadow-sm);
+            }
+
+            .info-content {
+                flex: 1;
+            }
+
+            .info-label {
+                display: block;
+                font-size: 0.875rem;
+                font-weight: 500;
+                color: var(--gray-600);
+                margin-bottom: 0.25rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .info-value {
+                font-size: 1rem;
+                font-weight: 600;
+                color: var(--gray-900);
+            }
+
+            .compound-icon {
+                width: 60px;
+                height: 60px;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .compound-type-badge .badge {
+                border-radius: 25px;
+                font-weight: 500;
+            }
+
+            .classification-section {
+                padding: 1.5rem;
+                background: linear-gradient(135deg, var(--gray-50), white);
+                border-radius: var(--radius-lg);
+                border: 1px solid var(--gray-200);
+            }
+
+            .classification-badges .badge {
+                font-size: 0.875rem;
+                padding: 0.5rem 0.75rem;
+                border-radius: 20px;
+                font-weight: 500;
+            }
+
+            /* Responsive adjustments */
+            @media (max-width: 768px) {
+                .compound-icon {
+                    width: 50px;
+                    height: 50px;
+                }
+                
+                .compound-icon i {
+                    font-size: 1.5rem;
+                }
+                
+                .info-item {
+                    padding: 0.75rem;
+                }
+                
+                .classification-section {
+                    padding: 1rem;
+                }
+            }
+            </style>
+
+            <!-- Molecular Structure -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-atom me-2"></i>Molecular Structure
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div id="moleculeViewer" class="molecule-viewer" style="border: 1px solid #ddd; border-radius: 5px;">
+                                <div class="structure-placeholder">
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-atom fa-4x mb-3 text-muted"></i>
+                                        <p class="text-muted">Molecular Structure Visualization</p>
+                                        {% if compound.SMILES %}
+                                        <button class="btn btn-primary" onclick="loadMoleculeStructure()">
+                                            <i class="fas fa-play me-1"></i>Load Structure
+                                        </button>
+                                        {% else %}
+                                        <p class="text-muted">No structure data available</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            {% if compound.SMILES %}
+                            <div class="mb-3">
+                                <label class="form-label"><strong>SMILES String:</strong></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control font-monospace" value="{{ compound.SMILES }}" readonly>
+                                    <button class="btn btn-outline-primary" onclick="copyToClipboard('{{ compound.SMILES }}')" title="Copy SMILES">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if compound.InChI %}
+                            <div class="mb-3">
+                                <label class="form-label"><strong>InChI:</strong></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control font-monospace" 
+                                           value="{{ compound.InChI[:80] }}{% if compound.InChI|length > 80 %}...{% endif %}" readonly>
+                                    <button class="btn btn-outline-primary" onclick="showFullInChI()" title="View Full InChI">
+                                        <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Physicochemical Properties -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-flask me-2"></i>Physicochemical Properties
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="property-card p-3 mb-3 border rounded bg-light">
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Molecular Formula</span>
+                                    <strong class="font-monospace">{{ compound.Molecular_Formula or 'N/A' }}</strong>
+                                </div>
+                            </div>
+                            
+                            <div class="property-card p-3 mb-3 border rounded bg-light">
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Molecular Weight</span>
+                                    <strong>
+                                        {% if compound.Molecular_Weight %}
+                                            {{ "%.2f"|format(compound.Molecular_Weight) }} g/mol
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </strong>
+                                </div>
+                            </div>
+                            
+                            <div class="property-card p-3 mb-3 border rounded bg-light">
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">LogP</span>
+                                    <strong>{{ compound.XLogP or 'N/A' }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="property-card p-3 mb-3 border rounded bg-light">
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">H-Bond Donors</span>
+                                    <strong>{{ compound.get('H_Bond_Donor_Count', 'N/A') }}</strong>
+                                </div>
+                            </div>
+                            
+                            <div class="property-card p-3 mb-3 border rounded bg-light">
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">H-Bond Acceptors</span>
+                                    <strong>{{ compound.get('H_Bond_Acceptor_Count', 'N/A') }}</strong>
+                                </div>
+                            </div>
+                            
+                            <div class="property-card p-3 mb-3 border rounded bg-light">
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Rotatable Bonds</span>
+                                    <strong>{{ compound.get('Rotatable_Bond_Count', 'N/A') }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Predicted Targets -->
+        <div class="col-lg-4">
+            <div class="card sticky-top" style="top: 2rem;">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bullseye me-2"></i>Predicted Targets
+                        {% if targets_data and targets_data.statistics %}
+                        <span class="badge bg-primary ms-2">{{ targets_data.statistics.total }}</span>
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="targetsContainer">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2 text-muted">Loading predicted targets...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <button class="btn btn-outline-primary btn-sm w-100" onclick="window.open('/predict', '_blank')" title="Predict New Targets">
+                                <i class="fas fa-brain me-1"></i>Predict
+                            </button>
+                        </div>
+                        <div class="col-4">
+                            <button class="btn btn-outline-success btn-sm w-100" onclick="exportTargetsData()" title="Export Target Data">
+                                <i class="fas fa-download me-1"></i>Export
+                            </button>
+                        </div>
+                        <div class="col-4">
+                            <button class="btn btn-outline-info btn-sm w-100" onclick="viewTargetNetworkAnalysis()" title="Network Analysis">
+                                <i class="fas fa-project-diagram me-1"></i>Network
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Compound Not Found -->
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-warning">
+                <h4 class="alert-heading">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Compound Not Found
+                </h4>
+                <p class="mb-0">Please check if the compound ID is correct, or return to the list page to select again.</p>
+                <hr>
+                <a href="{{ url_for('compounds_view.compounds_list') }}" class="btn btn-outline-warning">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Compounds List
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if compound %}
+<script>
+// Page data
+window.compoundData = {{ compound | tojson | safe }};
+window.targetsData = {{ targets_data | tojson | safe }};
+
+// Additional utility functions for compound detail page
+function exportTargetsData() {
+    if (window.compoundData && window.compoundData.global_id) {
+        const url = `/api/compounds/${window.compoundData.global_id}/targets?format=csv`;
+        window.open(url, '_blank');
+    } else {
+        Utils.showToast('No compound data available for export', 'warning');
+    }
+}
+
+function viewTargetNetworkAnalysis() {
+    if (window.compoundData && window.compoundData.global_id) {
+        const url = `/compounds/${window.compoundData.global_id}/network`;
+        window.open(url, '_blank');
+    } else {
+        Utils.showToast('Network analysis coming soon', 'info');
+    }
+}
+</script>
+<script src="{{ url_for('static', filename='js/compounds.js') }}"></script>
+{% endif %}
+
+<!-- InChI Modal -->
+<div class="modal fade" id="inchiModal" tabindex="-1" aria-labelledby="inchiModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="inchiModalLabel">
+                    <i class="fas fa-dna me-2"></i>Complete InChI String
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">InChI String:</label>
+                    <textarea class="form-control font-monospace" id="fullInchiText" rows="8" readonly></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary" onclick="copyToClipboard(document.getElementById('fullInchiText').value)">
+                    <i class="fas fa-copy me-2"></i>Copy InChI
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

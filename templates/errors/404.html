@@ -1,0 +1,134 @@
+{% extends "base/base.html" %}
+
+{% block title %}页面未找到 - 茯苓靶点预测数据库{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 text-center">
+            <div class="error-content">
+                <!-- 404图标 -->
+                <div class="mb-4">
+                    <i class="fas fa-search fa-6x text-muted"></i>
+                </div>
+                
+                <!-- 错误码 -->
+                <h1 class="display-1 fw-bold text-primary">404</h1>
+                
+                <!-- 错误描述 -->
+                <h2 class="mb-4">页面未找到</h2>
+                <p class="lead text-muted mb-4">
+                    抱歉，您访问的页面不存在或已被删除。
+                </p>
+                
+                <!-- 建议操作 -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">您可以尝试：</h5>
+                        <ul class="list-unstyled text-start">
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                检查URL是否输入正确
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                返回首页重新开始
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                使用搜索功能查找内容
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                查看帮助文档
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 快速导航按钮 -->
+                <div class="d-grid gap-2 d-md-block">
+                    <a href="{{ url_for('pages.index') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-home me-2"></i>返回首页
+                    </a>
+                    <a href="{{ url_for('pages.search_page') }}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-search me-2"></i>搜索内容
+                    </a>
+                </div>
+                
+                <!-- 快速链接 -->
+                <div class="mt-5">
+                    <h6 class="text-muted">快速访问</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="list-group list-group-flush">
+                                <a href="{{ url_for('compounds_view.compounds_list') }}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-atom text-primary me-2"></i>化合物数据库
+                                </a>
+                                <a href="{{ url_for('targets_view.targets_list') }}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-bullseye text-success me-2"></i>靶点数据库
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="list-group list-group-flush">
+                                <a href="/api" class="list-group-item list-group-item-action" target="_blank">
+                                    <i class="fas fa-code text-info me-2"></i>API文档
+                                </a>
+                                <a href="{{ url_for('pages.help_page') }}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-question-circle text-warning me-2"></i>帮助文档
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 搜索建议 -->
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>或者试试搜索
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('pages.search_page') }}" method="get">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control" name="q" 
+                                   placeholder="输入化合物名称、基因名称或关键词...">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search me-1"></i>搜索
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- 搜索建议 -->
+                    <div class="mt-3 text-center">
+                        <small class="text-muted">搜索建议：</small>
+                        <a href="{{ url_for('pages.search_page') }}?q=茯苓酸" class="badge bg-light text-dark text-decoration-none ms-1">茯苓酸</a>
+                        <a href="{{ url_for('pages.search_page') }}?q=UGT" class="badge bg-light text-dark text-decoration-none ms-1">UGT</a>
+                        <a href="{{ url_for('pages.search_page') }}?q=三萜" class="badge bg-light text-dark text-decoration-none ms-1">三萜</a>
+                        <a href="{{ url_for('pages.search_page') }}?q=CYP450" class="badge bg-light text-dark text-decoration-none ms-1">CYP450</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 404页面统计（可选）
+console.log('404 Page - URL:', window.location.href);
+</script>
+{% endblock %}

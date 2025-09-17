@@ -1,0 +1,69 @@
+茯苓靶点预测数据库/
+├── README.md
+├── requirements.txt
+├── app.py                          # Flask应用入口
+├── config.py                       # 配置文件
+├── .gitignore
+│
+├── api/                           # API接口层（已存在）
+│   ├── __init__.py
+│   ├── compounds.py              # 化合物API
+│   └── targets.py                # 靶点API
+│
+├── views/                         # 页面视图层
+│   ├── __init__.py
+│   ├── pages.py                  # 主要页面控制器
+│   ├── compounds.py              # 化合物页面控制器
+│   └── targets.py                # 靶点页面控制器
+│
+├── models/                        # 数据模型层（已存在）
+│   ├── __init__.py
+│   ├── compound.py               # 化合物模型
+│   └── target.py                 # 靶点模型
+│
+├── services/                      # 业务逻辑层（已存在）
+│   ├── __init__.py
+│   ├── compound_service.py       # 化合物服务
+│   └── target_service.py         # 靶点服务
+│
+├── utils/                         # 工具类（已存在）
+│   ├── __init__.py
+│   ├── pagination.py             # 分页工具
+│   └── cache.py                  # 缓存工具
+│
+├── templates/                     # HTML模板
+│   ├── base/                     # 基础模板
+│   │   ├── base.html             # 基础布局（已完成）
+│   │   └── navbar.html           # 导航栏（已完成）
+│   ├── pages/                    # 主要页面
+│   │   ├── index.html            # 首页（已完成）
+│   │   ├── search.html           # 全局搜索页
+│   │   ├── statistics.html           # 数据统计页
+│   │   ├── compare.html           # 化合物对比页
+│   │   └── help.html             # 帮助页
+│   ├── compounds/                # 化合物页面
+│   │   ├── list.html             # 化合物列表
+│   │   └── detail.html           # 化合物详情
+│   ├── targets/                  # 靶点页面
+│   │   ├── list.html             # 靶点列表
+│   │   └── detail.html           # 靶点详情
+│   └── errors/                   # 错误页面
+│       └── 404.html              # 404页面
+│
+├── static/                        # 静态文件
+│   ├── css/                      # 样式文件
+│   │   └── custom.css            # 自定义样式（已完成）
+│   ├── js/                       # JavaScript文件
+│   │   ├── app.js                # 应用主脚本（已完成）
+│   │   ├── index.js              # 首页脚本（已完成）
+│   │   ├── compounds.js          # 化合物模块脚本（待开发）
+│   │   └── targets.js            # 靶点模块脚本（待开发）
+│   └── images/                   # 图片文件
+│       └── favicon.ico           # 网站图标
+│
+└── data/                          # 数据文件（已存在）
+    ├── compounds.csv             # 化合物数据
+    ├── targets.xlsx              # 靶点数据
+    ├── huifayou/                 # 挥发油预测结果
+    ├── santie/                   # 三萜预测结果
+    └── zaichun/                  # 甾醇预测结果

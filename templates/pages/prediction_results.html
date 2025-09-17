@@ -1,0 +1,365 @@
+{% extends "base/base.html" %}
+
+{% block title %}Prediction Results{% endblock %}
+
+{% block extra_css %}
+<style>
+.result-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.result-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.confidence-indicator {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+.confidence-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.interaction-network {
+    min-height: 500px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+}
+
+.score-distribution {
+    min-height: 300px;
+}
+
+.export-options {
+    position: sticky;
+    top: 20px;
+    z-index: 100;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Loading State -->
+    <div id="loading-state" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3 text-muted">Loading prediction results...</p>
+    </div>
+
+    <!-- Main Content (hidden initially) -->
+    <div id="main-content" style="display: none;">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h1 class="h3 mb-1">Prediction Results</h1>
+                        <p class="text-muted mb-0">Job ID: <code>{{ job_id }}</code></p>
+                        <div class="d-flex align-items-center mt-2">
+                            <span class="badge bg-success me-2" id="status-badge">Completed</span>
+                            <small class="text-muted" id="completion-time"></small>
+                        </div>
+                    </div>
+                    <div class="export-options">
+                        <div class="btn-group">
+                            <button class="btn btn-primary" id="download-csv">
+                                <i class="fas fa-download me-2"></i>Download CSV
+                            </button>
+                            <button class="btn btn-outline-primary" id="download-excel">
+                                <i class="fas fa-file-excel me-2"></i>Excel
+                            </button>
+                            <button class="btn btn-outline-info" id="share-results">
+                                <i class="fas fa-share me-2"></i>Share
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Statistics -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card result-card h-100">
+                    <div class="card-body text-center">
+                        <div class="text-primary mb-2">
+                            <i class="fas fa-network-wired fa-2x"></i>
+                        </div>
+                        <h3 class="mb-1" id="total-interactions">-</h3>
+                        <p class="text-muted mb-0">Total Interactions</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card result-card h-100">
+                    <div class="card-body text-center">
+                        <div class="text-success mb-2">
+                            <i class="fas fa-star fa-2x"></i>
+                        </div>
+                        <h3 class="mb-1" id="high-confidence">-</h3>
+                        <p class="text-muted mb-0">High Confidence (≥0.95)</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card result-card h-100">
+                    <div class="card-body text-center">
+                        <div class="text-info mb-2">
+                            <i class="fas fa-bullseye fa-2x"></i>
+                        </div>
+                        <h3 class="mb-1" id="unique-targets">-</h3>
+                        <p class="text-muted mb-0">Unique Targets</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card result-card h-100">
+                    <div class="card-body text-center">
+                        <div class="text-warning mb-2">
+                            <i class="fas fa-chart-line fa-2x"></i>
+                        </div>
+                        <h3 class="mb-1" id="avg-score">-</h3>
+                        <p class="text-muted mb-0">Average Score</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Tabs -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs" id="analysis-tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="interactions-tab" data-bs-toggle="tab" 
+                                        data-bs-target="#interactions-panel" type="button" role="tab">
+                                    <i class="fas fa-table me-2"></i>Interactions Table
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="visualization-tab" data-bs-toggle="tab" 
+                                        data-bs-target="#visualization-panel" type="button" role="tab">
+                                    <i class="fas fa-chart-bar me-2"></i>Visualizations
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="network-tab" data-bs-toggle="tab" 
+                                        data-bs-target="#network-panel" type="button" role="tab">
+                                    <i class="fas fa-project-diagram me-2"></i>Network View
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="analysis-tab" data-bs-toggle="tab" 
+                                        data-bs-target="#analysis-panel" type="button" role="tab">
+                                    <i class="fas fa-microscope me-2"></i>Analysis
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content" id="analysis-content">
+                            <!-- Interactions Table -->
+                            <div class="tab-pane fade show active" id="interactions-panel" role="tabpanel">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-search"></i>
+                                            </span>
+                                            <input type="text" class="form-control" id="table-search" 
+                                                   placeholder="Search interactions...">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex gap-2">
+                                            <select class="form-select" id="confidence-filter">
+                                                <option value="">All Confidence Levels</option>
+                                                <option value="high">High (≥0.95)</option>
+                                                <option value="medium">Medium (0.8-0.95)</option>
+                                                <option value="low">Low (<0.8)</option>
+                                            </select>
+                                            <button class="btn btn-outline-secondary" id="reset-filters">
+                                                <i class="fas fa-undo"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="interactions-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Compound</th>
+                                                <th>Target Protein</th>
+                                                <th>Gene</th>
+                                                <th>Score</th>
+                                                <th>Confidence</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Data will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Visualizations -->
+                            <div class="tab-pane fade" id="visualization-panel" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">Score Distribution</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="score-distribution">
+                                                    <canvas id="score-histogram"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">Top Targets</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="score-distribution">
+                                                    <canvas id="targets-chart"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">Score vs Properties</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <canvas id="scatter-plot" height="400"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Network View -->
+                            <div class="tab-pane fade" id="network-panel" role="tabpanel">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h6 class="card-title mb-0">Interaction Network</h6>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary" id="reset-network">
+                                                <i class="fas fa-sync"></i> Reset View
+                                            </button>
+                                            <button class="btn btn-outline-success" id="export-network">
+                                                <i class="fas fa-download"></i> Export
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="interaction-network" id="network-container">
+                                            <div class="text-center py-5">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Loading network...</span>
+                                                </div>
+                                                <p class="mt-3 text-muted">Building interaction network...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Analysis -->
+                            <div class="tab-pane fade" id="analysis-panel" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">Pathway Enrichment</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div id="pathway-analysis">
+                                                    <p class="text-muted">Analyzing biological pathways...</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">Target Families</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div id="target-families">
+                                                    <canvas id="families-chart"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">Compound Properties Analysis</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div id="properties-analysis">
+                                                    <!-- Will be populated with compound properties analysis -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back to Prediction -->
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('prediction_views.predict_page') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Prediction
+                    </a>
+                    <button class="btn btn-primary" id="new-prediction">
+                        <i class="fas fa-plus me-2"></i>New Prediction
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+<script>
+// Page configuration
+window.pageConfig = {
+    jobId: '{{ job_id }}',
+    apiBaseUrl: '/api/predict'
+};
+</script>
+<script src="{{ url_for('static', filename='js/prediction_results.js') }}"></script>
+{% endblock %}

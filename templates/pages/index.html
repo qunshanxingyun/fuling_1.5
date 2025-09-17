@@ -1,0 +1,457 @@
+{% extends "base/base.html" %}
+
+{% block title %}Poria Cocos Target Prediction Database - Home{% endblock %}
+
+{% block meta_description %}Comprehensive database for predicting molecular targets of Poria cocos active compounds using deep learning DrugBAN model. Access 151 compounds, 1,885 targets, and 21,488 high-confidence interactions.{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-content">
+        <div class="container">
+            <div class="row align-items-center min-vh-75">
+                <div class="col-lg-8">
+                    <div class="fade-in">
+                        <!-- templates/pages/index.html (NEW TITLE/DESCRIPTION - OPTION B) -->
+                    <!-- templates/pages/index.html (NEW TITLE/DESCRIPTION - OPTION A) -->
+                    <h1 class="display-4 fw-bold mb-3">
+                        <span style="color: var(--primary-400);">PoriaDB:</span> AI-Powered Target Prediction
+                    </h1>
+                    <p class="lead mb-4 fs-5" style="max-width: 650px;">
+                        Explore high-confidence molecular targets of Poria cocos, predicted by the state-of-the-art DrugBAN deep learning model. Your gateway to modern pharmacological research.
+                    </p>
+                        <div class="d-flex gap-3 mb-5 flex-wrap">
+                            <a href="{{ url_for('compounds_view.compounds_list') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-atom me-2"></i>Browse Compounds
+                            </a>
+                            <a href="{{ url_for('targets_view.targets_list') }}" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-bullseye me-2"></i>Explore Targets
+                            </a>
+                            <a href="/api" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-code me-2"></i>API Access
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <div class="molecule-animation">
+                        <i class="fas fa-atom fa-8x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Database Statistics -->
+    <div class="hero-stats">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="hero-stat">
+                        <span class="hero-stat-number">{{ stats.compounds.total or 151 }}</span>
+                        <div class="hero-stat-label">Active Compounds</div>
+                        <small class="opacity-75">Including triterpenes, sterols, and essential oils</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="hero-stat">
+                        <span class="hero-stat-number">{{ stats.targets.total_targets or 1885 }}</span>
+                        <div class="hero-stat-label">Predicted Targets</div>
+                        <small class="opacity-75">Human protein targets with high confidence</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="hero-stat">
+                        <span class="hero-stat-number">21,488</span>
+                        <div class="hero-stat-label">High-Confidence Interactions</div>
+                        <small class="opacity-75">Prediction score ≥ 0.95</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container py-5">
+    <!-- Quick Search Section -->
+    <section id="search" class="mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="search-card">
+                    <div class="card-body p-4">
+                        <h2 class="text-center mb-4">
+                            <i class="fas fa-search text-primary me-2"></i>
+                            Search Database
+                        </h2>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="search-input-group">
+                                    <label class="form-label fw-semibold">Find Compounds</label>
+                                    <div class="input-group input-group-lg">
+                                        <span class="input-group-text bg-white border-end-0">
+                                            <i class="fas fa-atom text-primary"></i>
+                                        </span>
+                                        <input type="text" class="form-control border-start-0" 
+                                               placeholder="Name, formula, or SMILES" 
+                                               id="compoundSearch">
+                                        <button class="btn btn-primary" type="button" onclick="searchCompounds()">
+                                            Search
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="search-input-group">
+                                    <label class="form-label fw-semibold">Find Targets</label>
+                                    <div class="input-group input-group-lg">
+                                        <span class="input-group-text bg-white border-end-0">
+                                            <i class="fas fa-bullseye text-success"></i>
+                                        </span>
+                                        <input type="text" class="form-control border-start-0" 
+                                               placeholder="Name or symbol" 
+                                               id="targetSearch">
+                                        <button class="btn btn-success" type="button" onclick="searchTargets()">
+                                            Search
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Search Suggestions -->
+                        <div class="search-suggestions">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <small class="text-muted fw-semibold">Example compounds:</small>
+                                    <div class="mt-2">
+                                        <span class="search-example badge me-2 mb-1" data-query="pachymic acid" data-type="compound">Pachymic acid</span>
+                                        <span class="search-example badge me-2 mb-1" data-query="β-amyrin" data-type="compound">β-Amyrin</span>
+                                        <span class="search-example badge me-2 mb-1" data-query="C30H48O3" data-type="compound">C30H48O3</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted fw-semibold">Example targets:</small>
+                                    <div class="mt-2">
+                                        <span class="search-example badge me-2 mb-1" data-query="ABCB1" data-type="target">ABCB1</span>
+                                        <span class="search-example badge me-2 mb-1" data-query="UGT" data-type="target">UGT</span>
+                                        <span class="search-example badge me-2 mb-1" data-query="DNA polymerase" data-type="target">DNA polymerase</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Features Section -->
+    <section id="features" class="mb-5">
+        <div class="text-center mb-5">
+            <h2 class="display-6 mb-3">Key Features</h2>
+            <p class="lead text-muted">Explore the comprehensive functionality of our database</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="feature-card card h-100 border-0 shadow">
+                    <div class="card-body">
+                        <div class="feature-icon">
+                            <i class="fas fa-atom fa-2x text-primary"></i>
+                        </div>
+                        <h5 class="card-title">Compound Database</h5>
+                        <p class="card-text">
+                            Comprehensive collection of 151 bioactive compounds from <em>Poria cocos</em> 
+                            including chemical structures, physicochemical properties, and molecular descriptors.
+                        </p>
+                        <ul class="list-unstyled text-sm">
+                            <li><i class="fas fa-check text-success me-1"></i>SMILES structural data</li>
+                            <li><i class="fas fa-check text-success me-1"></i>Molecular properties</li>
+                            <li><i class="fas fa-check text-success me-1"></i>PubChem integration</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-light text-center border-0">
+                        <a href="{{ url_for('compounds_view.compounds_list') }}" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt me-1"></i>Explore Compounds
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="feature-card card h-100 border-0 shadow">
+                    <div class="card-body">
+                        <div class="feature-icon">
+                            <i class="fas fa-bullseye fa-2x text-success"></i>
+                        </div>
+                        <h5 class="card-title">Target Prediction</h5>
+                        <p class="card-text">
+                            Advanced DrugBAN deep learning model for predicting high-confidence 
+                            compound-target interactions with bilinear attention mechanism.
+                        </p>
+                        <ul class="list-unstyled text-sm">
+                            <li><i class="fas fa-check text-success me-1"></i>Deep learning predictions</li>
+                            <li><i class="fas fa-check text-success me-1"></i>Confidence score ≥ 0.95</li>
+                            <li><i class="fas fa-check text-success me-1"></i>Human protein targets</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-light text-center border-0">
+                        <a href="{{ url_for('targets_view.targets_list') }}" class="btn btn-success">
+                            <i class="fas fa-external-link-alt me-1"></i>View Targets
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="feature-card card h-100 border-0 shadow">
+                    <div class="card-body">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line fa-2x text-info"></i>
+                        </div>
+                        <h5 class="card-title">Enrichment Analysis</h5>
+                        <p class="card-text">
+                            Integrated GO functional enrichment and KEGG pathway analysis 
+                            to understand the biological mechanisms of <em>Poria cocos</em> compounds.
+                        </p>
+                        <ul class="list-unstyled text-sm">
+                            <li><i class="fas fa-check text-success me-1"></i>GO enrichment analysis</li>
+                            <li><i class="fas fa-check text-success me-1"></i>KEGG pathway mapping</li>
+                            <li><i class="fas fa-check text-success me-1"></i>Network pharmacology</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-light text-center border-0">
+                        <a href="{{ url_for('pages.help_page') }}" class="btn btn-info">
+                            <i class="fas fa-external-link-alt me-1"></i>Learn More
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Research Background Section -->
+    <section id="background" class="mb-5">
+        <div class="card border-0 shadow-lg bg-gradient-light">
+            <div class="card-body p-5">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <h2 class="display-6 mb-4">
+                            <i class="fas fa-microscope text-primary me-2"></i>
+                            Research Background
+                        </h2>
+                        <p class="lead mb-4">
+                            <em>Poria cocos</em> is an important medicinal and edible fungus with a long history 
+                            of application in Traditional Chinese Medicine. Our database leverages deep learning 
+                            technology and the DrugBAN (Bilinear Attention Network) model to predict interactions 
+                            between <em>Poria cocos</em> active compounds and human protein targets.
+                        </p>
+                        <p class="mb-4">
+                            Through systematic analysis of 151 active compounds (102 triterpenes, 17 sterols, 
+                            and 32 essential oil compounds) against 4,759 human proteins, we identified 21,488 
+                            high-confidence molecular-target interaction pairs, providing crucial data support 
+                            for <em>Poria cocos</em> pharmacological mechanism research and drug development.
+                        </p>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="{{ url_for('pages.about_page') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-info-circle me-1"></i>Learn More
+                            </a>
+                            <a href="#" class="btn btn-outline-secondary">
+                                <i class="fas fa-file-alt me-1"></i>Read Publication
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="bg-white rounded-3 shadow p-4">
+                            <h5 class="fw-bold mb-3">
+                                <i class="fas fa-key text-warning me-2"></i>Key Highlights
+                            </h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Deep learning-based prediction
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    High-confidence filtering (≥0.95)
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Integrated enrichment analysis
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    3D structure visualization
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    RESTful API access
+                                </li>
+                                <li class="mb-0">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Open source platform
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- News and Updates Section -->
+    <!-- <section id="news" class="mb-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <h3 class="mb-4">
+                    <i class="fas fa-newspaper text-primary me-2"></i>
+                    Latest Updates
+                </h3>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item border-0 px-0">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1 text-primary">Database Version 2.0 Released</h6>
+                            <small class="text-muted">{{ current_month_year() }}</small>
+                        </div>
+                        <p class="mb-1">Enhanced user interface, improved search functionality, and expanded compound dataset.</p>
+                    </div>
+                    <div class="list-group-item border-0 px-0">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1 text-primary">API Documentation Updated</h6>
+                            <small class="text-muted">{{ current_month_year() }}</small>
+                        </div>
+                        <p class="mb-1">Comprehensive API guide with examples for programmatic access to our database.</p>
+                    </div>
+                    <div class="list-group-item border-0 px-0">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1 text-primary">Research Article Accepted</h6>
+                            <small class="text-muted">{{ current_month_year() }}</small>
+                        </div>
+                        <p class="mb-1">Our methodology paper has been accepted for publication in a high-impact journal.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-download me-2"></i>Quick Access
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="/api" class="btn btn-outline-primary">
+                                <i class="fas fa-code me-2"></i>API Documentation
+                            </a>
+                            <a href="#" class="btn btn-outline-success">
+                                <i class="fas fa-download me-2"></i>Download Dataset
+                            </a>
+                            <a href="{{ url_for('pages.help_page') }}" class="btn btn-outline-info">
+                                <i class="fas fa-book me-2"></i>User Guide
+                            </a>
+                            <a href="https://github.com/your-repo" class="btn btn-outline-dark">
+                                <i class="fab fa-github me-2"></i>Source Code
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section> -->
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Pass statistical data to JavaScript -->
+<script type="application/json" id="stats-data">{{ stats | tojson | safe }}</script>
+
+<!-- Enhanced Index Page JavaScript -->
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+
+<!-- Additional JavaScript for enhanced features -->
+<script>
+// Search example functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle search examples
+    document.querySelectorAll('.search-example').forEach(badge => {
+        badge.addEventListener('click', function() {
+            const query = this.dataset.query;
+            const type = this.dataset.type;
+            
+            if (type === 'compound') {
+                document.getElementById('compoundSearch').value = query;
+                searchCompounds();
+            } else {
+                document.getElementById('targetSearch').value = query;
+                searchTargets();
+            }
+        });
+    });
+    
+    // Enhanced search with enter key support
+    document.getElementById('compoundSearch').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchCompounds();
+        }
+    });
+    
+    document.getElementById('targetSearch').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchTargets();
+        }
+    });
+    
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
+
+// Enhanced search functions
+function searchCompounds() {
+    const query = document.getElementById('compoundSearch').value.trim();
+    if (query) {
+        window.location.href = `/compounds?search=${encodeURIComponent(query)}`;
+    } else {
+        window.location.href = '/compounds';
+    }
+}
+
+function searchTargets() {
+    const query = document.getElementById('targetSearch').value.trim();
+    if (query) {
+        window.location.href = `/targets?search=${encodeURIComponent(query)}`;
+    } else {
+        window.location.href = '/targets';
+    }
+}
+
+// Animation on scroll
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -100px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('fade-in');
+        }
+    });
+}, observerOptions);
+
+// Observe all cards and sections
+document.querySelectorAll('.card, section').forEach(el => {
+    observer.observe(el);
+});
+</script>
+{% endblock %}

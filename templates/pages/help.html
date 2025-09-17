@@ -1,0 +1,308 @@
+{% extends "base/base.html" %}
+
+{% block title %}帮助文档 - 茯苓靶点预测数据库{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- 页面标题 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-6 mb-3">
+                <i class="fas fa-question-circle text-primary me-2"></i>帮助文档
+            </h1>
+            <p class="lead text-muted">了解如何使用茯苓靶点预测数据库</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 左侧导航 -->
+        <div class="col-lg-3">
+            <div class="card sticky-top">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">快速导航</h6>
+                </div>
+                <div class="card-body">
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="#overview">数据库概述</a>
+                        <a class="nav-link" href="#data-structure">数据结构</a>
+                        <a class="nav-link" href="#how-to-use">使用指南</a>
+                        <a class="nav-link" href="#api-docs">API文档</a>
+                        <a class="nav-link" href="#faq">常见问题</a>
+                        <a class="nav-link" href="#contact">联系我们</a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主要内容 -->
+        <div class="col-lg-9">
+            <!-- 数据库概述 -->
+            <section id="overview" class="mb-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">数据库概述</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>茯苓靶点预测数据库是基于深度学习技术构建的中药活性成分与靶标相互作用预测平台，采用DrugBAN（双线性注意力网络）模型进行预测分析。</p>
+                        
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                                <div class="bg-primary text-white rounded p-3 mb-3">
+                                    <h2 class="display-6">151</h2>
+                                    <p class="mb-0">活性化合物</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="bg-success text-white rounded p-3 mb-3">
+                                    <h2 class="display-6">1,885</h2>
+                                    <p class="mb-0">预测靶点</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="bg-info text-white rounded p-3 mb-3">
+                                    <h2 class="display-6">21,488</h2>
+                                    <p class="mb-0">高置信度相互作用</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h5 class="mt-4">主要特点：</h5>
+                        <ul>
+                            <li><strong>深度学习预测</strong>：基于DrugBAN模型，预测置信度≥0.95</li>
+                            <li><strong>多类型化合物</strong>：包含挥发油、三萜、甾醇三大类活性成分</li>
+                            <li><strong>富集分析</strong>：集成GO功能富集和KEGG通路分析</li>
+                            <li><strong>结构可视化</strong>：支持SMILES结构展示和3D构象预测</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 数据结构 -->
+            <section id="data-structure" class="mb-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">数据结构</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>化合物数据</h5>
+                                <ul>
+                                    <li>化合物ID（全局ID和本地ID）</li>
+                                    <li>中文名称和英文名称</li>
+                                    <li>化合物类型（挥发油/三萜/甾醇）</li>
+                                    <li>分子式和分子量</li>
+                                    <li>SMILES结构式</li>
+                                    <li>PubChem CID（如有）</li>
+                                    <li>理化性质参数</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>靶点数据</h5>
+                                <ul>
+                                    <li>基因名称和基因符号</li>
+                                    <li>UniProt ID</li>
+                                    <li>蛋白质名称</li>
+                                    <li>功能注释</li>
+                                    <li>亚细胞定位</li>
+                                    <li>预测得分统计</li>
+                                    <li>相关化合物信息</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 使用指南 -->
+            <section id="how-to-use" class="mb-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">使用指南</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="accordion" id="usageAccordion">
+                            <!-- 浏览化合物 -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                                        <i class="fas fa-atom text-primary me-2"></i>浏览化合物
+                                    </button>
+                                </h2>
+                                <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#usageAccordion">
+                                    <div class="accordion-body">
+                                        <p>在<strong>化合物</strong>页面，您可以：</p>
+                                        <ol>
+                                            <li>浏览所有化合物列表</li>
+                                            <li>按类型筛选（挥发油/三萜/甾醇）</li>
+                                            <li>搜索特定化合物</li>
+                                            <li>点击化合物查看详细信息</li>
+                                            <li>查看预测靶点和分子结构</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 查看靶点 -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                        <i class="fas fa-bullseye text-success me-2"></i>查看靶点
+                                    </button>
+                                </h2>
+                                <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#usageAccordion">
+                                    <div class="accordion-body">
+                                        <p>在<strong>靶点</strong>页面，您可以：</p>
+                                        <ol>
+                                            <li>浏览所有预测靶点</li>
+                                            <li>按基因家族筛选（UGT/CYP450等）</li>
+                                            <li>查看靶点的预测统计</li>
+                                            <li>了解靶点功能注释</li>
+                                            <li>查看相关化合物</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 搜索功能 -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                                        <i class="fas fa-search text-info me-2"></i>搜索功能
+                                    </button>
+                                </h2>
+                                <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#usageAccordion">
+                                    <div class="accordion-body">
+                                        <p>数据库提供多种搜索方式：</p>
+                                        <ul>
+                                            <li><strong>全局搜索</strong>：在导航栏搜索框或搜索页面</li>
+                                            <li><strong>化合物搜索</strong>：按名称、分子式、SMILES搜索</li>
+                                            <li><strong>靶点搜索</strong>：按基因名称、符号、功能搜索</li>
+                                        </ul>
+                                        <p>支持模糊匹配和关键词搜索。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- API文档 -->
+            <section id="api-docs" class="mb-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">API文档</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>数据库提供RESTful API接口，支持程序化访问：</p>
+                        
+                        <h5>基本信息</h5>
+                        <ul>
+                            <li><strong>API基础URL</strong>：<code>/api</code></li>
+                            <li><strong>数据格式</strong>：JSON</li>
+                            <li><strong>字符编码</strong>：UTF-8</li>
+                        </ul>
+                        
+                        <h5>主要接口</h5>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>接口</th>
+                                        <th>方法</th>
+                                        <th>说明</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>/api/compounds</code></td>
+                                        <td>GET</td>
+                                        <td>获取化合物列表</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>/api/compounds/{id}</code></td>
+                                        <td>GET</td>
+                                        <td>获取化合物详情</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>/api/targets</code></td>
+                                        <td>GET</td>
+                                        <td>获取靶点列表</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>/api/targets/{gene_name}</code></td>
+                                        <td>GET</td>
+                                        <td>获取靶点详情</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            详细的API文档请访问：<a href="/api" target="_blank">API接口文档</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 常见问题 -->
+            <section id="faq" class="mb-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">常见问题</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>Q: 预测得分的含义是什么？</h5>
+                                <p>A: 预测得分表示化合物与靶点结合的可能性，范围0-1。得分≥0.95被认为是高置信度的相互作用。</p>
+                                
+                                <h5>Q: 数据来源是什么？</h5>
+                                <p>A: 化合物数据来自文献和公共数据库，蛋白质数据主要来自UniProt等数据库。预测结果基于DrugBAN深度学习模型。</p>
+                                
+                                <h5>Q: 如何引用本数据库？</h5>
+                                <p>A: 请引用相关的研究论文和数据库网址。具体引用格式请联系我们获取。</p>
+                                
+                                <h5>Q: 数据更新频率？</h5>
+                                <p>A: 数据库会定期更新，包含新的化合物和改进的预测结果。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 联系我们 -->
+            <section id="contact" class="mb-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">联系我们</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>技术支持</h5>
+                                <p>如果您在使用过程中遇到问题，或有改进建议，请联系我们：</p>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-envelope me-2"></i>邮箱：support@example.com</li>
+                                    <li><i class="fas fa-globe me-2"></i>项目主页：GitHub Repository</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>反馈建议</h5>
+                                <p>我们欢迎您的反馈和建议，以帮助我们不断改进数据库：</p>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-bug me-2"></i>错误报告</li>
+                                    <li><i class="fas fa-lightbulb me-2"></i>功能建议</li>
+                                    <li><i class="fas fa-database me-2"></i>数据质量问题</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,192 @@
+{% extends "base/base.html" %}
+
+{% block title %}全局搜索 - 茯苓靶点预测数据库{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- 页面标题 -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1 class="display-5 mb-3">
+                <i class="fas fa-search text-primary me-2"></i>全局搜索
+            </h1>
+            <p class="lead text-muted">在化合物和靶点数据库中搜索</p>
+        </div>
+    </div>
+
+    <!-- 搜索表单 -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="globalSearchInput" 
+                               placeholder="输入化合物名称、基因名称或关键词..." 
+                               value="{{ request.args.get('q', '') }}">
+                        <button class="btn btn-primary" type="button" id="searchBtn">
+                            <i class="fas fa-search me-1"></i>搜索
+                        </button>
+                    </div>
+                    
+                    <!-- 搜索类型选择 -->
+                    <div class="mt-3 text-center">
+                        <div class="btn-group" role="group" aria-label="搜索范围">
+                            <input type="radio" class="btn-check" name="searchScope" id="scopeAll" value="all" checked>
+                            <label class="btn btn-outline-primary" for="scopeAll">全部</label>
+
+                            <input type="radio" class="btn-check" name="searchScope" id="scopeCompounds" value="compounds">
+                            <label class="btn btn-outline-primary" for="scopeCompounds">化合物</label>
+
+                            <input type="radio" class="btn-check" name="searchScope" id="scopeTargets" value="targets">
+                            <label class="btn btn-outline-primary" for="scopeTargets">靶点</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 搜索结果 -->
+    <div id="searchResults" style="display: none;">
+        <!-- 结果统计 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <h4 id="totalCount" class="text-primary">0</h4>
+                                <p class="text-muted mb-0">总结果</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 id="compoundsCount" class="text-success">0</h4>
+                                <p class="text-muted mb-0">化合物</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 id="targetsCount" class="text-info">0</h4>
+                                <p class="text-muted mb-0">靶点</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 化合物结果 -->
+        <div id="compoundsResults" class="row mb-4" style="display: none;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-atom text-success me-2"></i>化合物结果
+                            <span id="compoundsBadge" class="badge bg-success ms-2">0</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="compoundsContainer">
+                            <!-- 化合物结果将在这里显示 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 靶点结果 -->
+        <div id="targetsResults" class="row mb-4" style="display: none;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-bullseye text-info me-2"></i>靶点结果
+                            <span id="targetsBadge" class="badge bg-info ms-2">0</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="targetsContainer">
+                            <!-- 靶点结果将在这里显示 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 无结果时显示 -->
+    <div id="noResults" class="row" style="display: none;">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-search fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted">未找到匹配结果</h4>
+                    <p class="text-muted">请尝试：</p>
+                    <ul class="list-unstyled text-muted">
+                        <li>• 检查搜索词拼写</li>
+                        <li>• 使用更通用的关键词</li>
+                        <li>• 尝试不同的搜索范围</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载状态 -->
+    <div id="loadingResults" class="row" style="display: none;">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">搜索中...</span>
+                    </div>
+                    <p class="text-muted mb-0">正在搜索数据库...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 搜索建议 -->
+    <div id="searchSuggestions" class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>搜索建议
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>化合物搜索示例：</strong>
+                            <div class="mt-2">
+                                <span class="badge bg-light text-dark me-2 mb-1 search-example" data-query="茯苓酸" data-scope="compounds">茯苓酸</span>
+                                <span class="badge bg-light text-dark me-2 mb-1 search-example" data-query="β-香树脂醇" data-scope="compounds">β-香树脂醇</span>
+                                <span class="badge bg-light text-dark me-2 mb-1 search-example" data-query="C30H48O3" data-scope="compounds">C30H48O3</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>靶点搜索示例：</strong>
+                            <div class="mt-2">
+                                <span class="badge bg-light text-dark me-2 mb-1 search-example" data-query="UGT" data-scope="targets">UGT</span>
+                                <span class="badge bg-light text-dark me-2 mb-1 search-example" data-query="CYP450" data-scope="targets">CYP450</span>
+                                <span class="badge bg-light text-dark me-2 mb-1 search-example" data-query="DNA polymerase" data-scope="targets">DNA polymerase</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 页面配置
+window.pageConfig = {
+    initialQuery: '{{ request.args.get("q", "") }}'
+};
+</script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}

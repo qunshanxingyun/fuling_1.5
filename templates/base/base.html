@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block meta_description %}Poria cocos target prediction database based on deep learning DrugBAN model{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}poria cocos, target prediction, drug discovery, traditional chinese medicine, deep learning{% endblock %}">
+    <meta name="author" content="Poria Cocos Research Team">
+    
+    <title>{% block title %}Poria Cocos Target Prediction Database{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <!-- DataTables Responsive CSS -->
+    <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS - Fixed filename -->
+    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
+    
+    {% block extra_head %}{% endblock %}
+    
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Dataset",
+        "name": "Poria Cocos Target Prediction Database",
+        "description": "A comprehensive database for predicting molecular targets of Poria cocos active compounds using deep learning.",
+        "keywords": ["poria cocos", "target prediction", "traditional chinese medicine", "drug discovery"],
+        "creator": {
+            "@type": "Organization",
+            "name": "Poria Cocos Research Team"
+        },
+        "license": "https://creativecommons.org/licenses/by/4.0/",
+        "url": "{{ request.url_root }}"
+    }
+    </script>
+</head>
+<body class="bg-pattern">
+    <!-- Skip to main content for accessibility -->
+    <a class="visually-hidden-focusable" href="#main-content">Skip to main content</a>
+    
+    <!-- Navigation -->
+    {% include 'base/navbar_en.html' %}
+    
+    <!-- Main Content -->
+    <main id="main-content" class="min-vh-100">
+        <!-- Page Loading Indicator -->
+        <div id="page-loading" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white" style="z-index: 9999; display: none !important;">
+            <div class="text-center">
+                <div class="loading-spinner mb-3"></div>
+                <p class="text-muted">Loading...</p>
+            </div>
+        </div>
+        
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="container mt-3">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                            <i class="fas fa-{% if category == 'error' %}exclamation-triangle{% elif category == 'success' %}check-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Page Content -->
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="btn btn-primary position-fixed d-none" 
+            style="bottom: 2rem; right: 2rem; z-index: 1000; border-radius: 50%; width: 3rem; height: 3rem;"
+            aria-label="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-5 mt-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <h5 class="mb-3">
+                        <i class="fas fa-database me-2"></i>
+                        <em>Poria Cocos</em> Database
+                    </h5>
+                    <p class="text-light-50">
+                        A comprehensive target prediction database for <em>Poria cocos</em> active compounds 
+                        based on deep learning DrugBAN model.
+                    </p>
+                    <div class="d-flex gap-3 mt-3">
+                        <a href="#" class="text-light" aria-label="GitHub Repository">
+                            <i class="fab fa-github fa-lg"></i>
+                        </a>
+                        <a href="#" class="text-light" aria-label="Research Article">
+                            <i class="fas fa-file-alt fa-lg"></i>
+                        </a>
+                        <a href="#" class="text-light" aria-label="API Documentation">
+                            <i class="fas fa-code fa-lg"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2">
+                    <h6 class="mb-3">Database</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('compounds_view.compounds_list') }}" class="text-light-75">Compounds</a></li>
+                        <li><a href="{{ url_for('targets_view.targets_list') }}" class="text-light-75">Targets</a></li>
+                        <li><a href="{{ url_for('pages.search_page') }}" class="text-light-75">Search</a></li>
+                        <li><a href="/api" class="text-light-75">API</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-2">
+                    <h6 class="mb-3">Resources</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('pages.help_page') }}" class="text-light-75">Help</a></li>
+                        <li><a href="{{ url_for('pages.about_page') }}" class="text-light-75">About</a></li>
+                        <li><a href="#" class="text-light-75">Publications</a></li>
+                        <li><a href="#" class="text-light-75">Downloads</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-4">
+                    <h6 class="mb-3">Citation</h6>
+                    <div class="bg-dark border p-3 rounded">
+                        <small class="font-monospace">
+                            Research Article (2025). "Deep Learning-Based Target Prediction 
+                            for Poria cocos Active Compounds Using DrugBAN Model." 
+                            <em>Journal Name</em>, Volume(Issue), pages.
+                        </small>
+                    </div>
+                    <button class="btn btn-outline-light btn-sm mt-2" onclick="copyToClipboard(this.previousElementSibling.querySelector('small').textContent)">
+                        <i class="fas fa-copy me-1"></i>Copy Citation
+                    </button>
+                </div>
+            </div>
+            
+            <hr class="my-4 border-secondary">
+            
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0">
+                        © {{ current_year() }} Poria Cocos Target Prediction Database. 
+                        Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" class="text-light">CC BY 4.0</a>.
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="d-flex justify-content-md-end gap-3 mt-2 mt-md-0">
+                        <small class="text-light-75">Database Version {{ app_version() }}</small>
+                        <small class="text-light-75">Last Updated: {{ current_month_year() }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Core JavaScript Libraries -->
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" 
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" 
+            crossorigin="anonymous"></script>
+    
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+    
+    <!-- SMILES Drawer for molecular structures -->
+    <script src="https://cdn.jsdelivr.net/npm/smiles-drawer@2.0.0/dist/smiles-drawer.min.js"></script>
+    
+    <!-- 3Dmol.js for 3D molecular visualization -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/3dmol/2.0.4/3Dmol-min.js"></script>
+    
+    <!-- Custom Application JavaScript -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    
+    {% block extra_js %}{% endblock %}
+    
+    <!-- Page Analytics (if needed) -->
+    <script>
+        // Page performance tracking
+        window.addEventListener('load', function() {
+            const loadTime = performance.now();
+            console.log(`Page loaded in ${loadTime.toFixed(2)}ms`);
+        });
+        
+        // Error tracking
+        window.addEventListener('error', function(e) {
+            console.error('Page error:', e.error);
+        });
+    </script>
+    
+    <!-- Service Worker Registration (for offline capability) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(function(registration) {
+                    console.log('ServiceWorker registration successful');
+                })
+                .catch(function(err) {
+                    console.log('ServiceWorker registration failed');
+                });
+        }
+    </script>
+</body>
+</html>

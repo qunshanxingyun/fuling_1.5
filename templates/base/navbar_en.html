@@ -1,0 +1,334 @@
+<!-- templates/base/navbar_en.html -->
+{% set safe_endpoint = request.endpoint or '' %}
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container-fluid">
+        <!-- Brand -->
+        <a class="navbar-brand d-flex align-items-center" href="{{ url_for('pages.index') }}">
+            <i class="fas fa-database me-2"></i>
+            <span class="fw-bold">PoriaDB</span>
+        </a>
+
+        <!-- Mobile toggle button -->
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+            aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navigation items -->
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <!-- Home -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'pages.index' %}active{% endif %}" 
+                       href="{{ url_for('pages.index') }}">
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
+                </li>
+                
+                <!-- Compounds Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {% if 'compounds' in safe_endpoint %}active{% endif %}" 
+                       href="#" id="compoundsDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-atom me-1"></i>Compounds
+                    </a>
+                    <ul class="dropdown-menu shadow" aria-labelledby="compoundsDropdown">
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('compounds_view.compounds_list') }}">
+                                <i class="fas fa-list me-2 text-primary"></i>
+                                <div>
+                                    <div class="fw-semibold">Browse All</div>
+                                    <small class="text-muted">View all compounds</small>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('pages.search_page') }}">
+                                <i class="fas fa-search me-2 text-success"></i>
+                                <div>
+                                    <div class="fw-semibold">Search</div>
+                                    <small class="text-muted">Find specific compounds</small>
+                                </div>
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li class="dropdown-header">
+                            <i class="fas fa-flask me-1"></i>By Chemical Class
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('compounds_view.compounds_by_type', compound_type='挥发油') }}">
+                                <i class="fas fa-wind me-2 text-success"></i>
+                                <div>
+                                    <div class="fw-semibold">Essential Oils</div>
+                                    <small class="text-muted">Volatile compounds</small>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('compounds_view.compounds_by_type', compound_type='三萜') }}">
+                                <i class="fas fa-leaf me-2 text-info"></i>
+                                <div>
+                                    <div class="fw-semibold">Triterpenes</div>
+                                    <small class="text-muted">Triterpene compounds</small>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('compounds_view.compounds_by_type', compound_type='甾醇') }}">
+                                <i class="fas fa-ring me-2 text-warning"></i>
+                                <div>
+                                    <div class="fw-semibold">Sterols</div>
+                                    <small class="text-muted">Sterol compounds</small>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Targets Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {% if 'targets' in safe_endpoint %}active{% endif %}" 
+                       href="#" id="targetsDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-bullseye me-1"></i>Targets
+                    </a>
+                    <ul class="dropdown-menu shadow" aria-labelledby="targetsDropdown">
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('targets_view.targets_list') }}">
+                                <i class="fas fa-list me-2 text-primary"></i>
+                                <div>
+                                    <div class="fw-semibold">Browse All</div>
+                                    <small class="text-muted">View all predicted targets</small>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('pages.search_page') }}">
+                                <i class="fas fa-search me-2 text-success"></i>
+                                <div>
+                                    <div class="fw-semibold">Search</div>
+                                    <small class="text-muted">Find specific targets</small>
+                                </div>
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </li>
+
+                <!-- Analysis Dropdown -->
+                <!-- Analysis Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="analysisDropdown" role="button"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-chart-bar me-1"></i>Analysis
+                    </a>
+                    <ul class="dropdown-menu shadow" aria-labelledby="analysisDropdown">
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('pages.predict_page') }}">
+                                <i class="fas fa-brain me-2 text-danger"></i>
+                                <div>
+                                    <div class="fw-semibold">DTI Prediction</div>
+                                    <small class="text-muted">Predict drug-target interactions</small>
+                                </div>
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('pages.statistics_page') }}">
+                                <i class="fas fa-chart-pie me-2 text-primary"></i>
+                                <div>
+                                    <div class="fw-semibold">Statistics</div>
+                                    <small class="text-muted">Database overview</small>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/api">
+                                <i class="fas fa-code me-2 text-info"></i>
+                                <div>
+                                    <div class="fw-semibold">API Access</div>
+                                    <small class="text-muted">Programmatic access</small>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Help Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="helpDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-question-circle me-1"></i>Help
+                    </a>
+                    <ul class="dropdown-menu shadow" aria-labelledby="helpDropdown">
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('pages.help_page') }}">
+                                <i class="fas fa-book me-2 text-primary"></i>
+                                <div>
+                                    <div class="fw-semibold">Documentation</div>
+                                    <small class="text-muted">User guide & tutorials</small>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('pages.about_page') }}">
+                                <i class="fas fa-info-circle me-2 text-success"></i>
+                                <div>
+                                    <div class="fw-semibold">About</div>
+                                    <small class="text-muted">Project information</small>
+                                </div>
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="https://github.com/your-repo" target="_blank">
+                                <i class="fab fa-github me-2 text-dark"></i>
+                                <div>
+                                    <div class="fw-semibold">Source Code</div>
+                                    <small class="text-muted">GitHub repository</small>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#citationModal">
+                                <i class="fas fa-quote-right me-2 text-warning"></i>
+                                <div>
+                                    <div class="fw-semibold">Citation</div>
+                                    <small class="text-muted">How to cite this work</small>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <!-- Search form -->
+            <form class="d-flex ms-auto" action="{{ url_for('pages.search_page') }}" method="GET" role="search">
+                <div class="input-group">
+                    <input class="form-control border-end-0" type="search" name="q" 
+                           placeholder="Search compounds, targets..." 
+                           aria-label="Search database"
+                           style="max-width: 250px;">
+                    <button class="btn btn-outline-light border-start-0" type="submit" aria-label="Search">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- Citation Modal -->
+<div class="modal fade" id="citationModal" tabindex="-1" aria-labelledby="citationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="citationModalLabel">
+                    <i class="fas fa-quote-right me-2"></i>How to Cite
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-4">
+                    <h6 class="fw-semibold">Research Article</h6>
+                    <div class="p-3 bg-light rounded border">
+                        <div class="font-monospace small" id="citationText">
+                            [Author Names]. (2025). Deep Learning-Based Target Prediction for Poria cocos 
+                            Active Compounds Using DrugBAN Model. <em>Journal Name</em>, Volume(Issue), pages. 
+                            DOI: [DOI]
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-primary btn-sm mt-2" onclick="copyToClipboard(document.getElementById('citationText').textContent.trim())">
+                        <i class="fas fa-copy me-1"></i>Copy Citation
+                    </button>
+                </div>
+                
+                <div class="mb-4">
+                    <h6 class="fw-semibold">Database</h6>
+                    <div class="p-3 bg-light rounded border">
+                        <div class="font-monospace small" id="databaseCitation">
+                            Poria Cocos Target Prediction Database. (2025). 
+                            Available at: {{ request.url_root }}
+                            (Accessed: {{ current_date('%B %d, %Y') }})
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-primary btn-sm mt-2" onclick="copyToClipboard(document.getElementById('databaseCitation').textContent.trim())">
+                        <i class="fas fa-copy me-1"></i>Copy Citation
+                    </button>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Please cite both the research article and the database if you use our data in your research.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast container for copy notifications -->
+<div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer" style="z-index: 1055;">
+    <!-- Toasts will be inserted here by JavaScript -->
+</div>
+
+<script>
+// Copy to clipboard functionality with toast notification
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        showToast('Citation copied to clipboard!', 'success');
+    }).catch(function(err) {
+        console.error('Failed to copy: ', err);
+        showToast('Failed to copy citation', 'error');
+    });
+}
+
+// Show toast notification
+function showToast(message, type = 'info') {
+    const toastContainer = document.getElementById('toastContainer');
+    const toastId = 'toast_' + Date.now();
+    const iconClass = type === 'success' ? 'fa-check-circle' : 
+                     type === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+    const bgClass = type === 'success' ? 'text-bg-success' : 
+                   type === 'error' ? 'text-bg-danger' : 'text-bg-primary';
+    
+    const toastHtml = `
+        <div class="toast ${bgClass}" id="${toastId}" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-body">
+                <i class="fas ${iconClass} me-2"></i>
+                ${message}
+            </div>
+        </div>
+    `;
+    
+    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+    
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement, {
+        autohide: true,
+        delay: 3000
+    });
+    
+    toast.show();
+    
+    toastElement.addEventListener('hidden.bs.toast', function() {
+        toastElement.remove();
+    });
+}
+
+// Highlight active navigation items
+document.addEventListener('DOMContentLoaded', function() {
+    // Get current path
+    const currentPath = window.location.pathname;
+    
+    // Find matching nav links and add active class
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+            link.classList.add('active');
+        }
+    });
+});
+</script>

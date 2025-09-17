@@ -1,0 +1,1028 @@
+/* ==========================================================================
+   Poria Cocos Target Prediction Database - Academic Styles
+   Modern, professional design for scientific database
+   ========================================================================== */
+
+/* CSS Variables for Bio-Tech Color Scheme */
+:root {
+    /* Primary Bio-Tech Greens & Teals */
+    --primary-50: #f0fdfa;
+    --primary-100: #ccfbf1;
+    --primary-200: #99f6e4;
+    --primary-300: #5eead4;
+    --primary-400: #2dd4bf;
+    --primary-500: #14b8a6; /* Main Accent Color */
+    --primary-600: #0d9488;
+    --primary-700: #0f766e;
+    --primary-800: #115e59;
+    --primary-900: #134e4a; /* Dark Teal */
+  
+    /* Scientific Grays & Dark Backgrounds */
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b; /* Near Black */
+    --gray-900: #0f172a; /* Deepest Dark */
+  
+    /* Accent Colors (re-themed for consistency) */
+    --emerald-500: #34d399; /* A vibrant secondary green */
+    --emerald-600: #059669;
+    --amber-500: #67e8f9; /* Changed from yellow to a bright cyan */
+    --amber-600: #22d3ee;
+    --red-500: #ef4444;
+    --red-600: #dc2626;
+    --purple-500: #818cf8; /* A muted indigo as tertiary accent */
+    --purple-600: #6366f1;
+  
+    /* Typography */
+    --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-family-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  
+    /* Shadows (keep as is, they are good) */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    
+    /* Border Radius (keep as is) */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+}
+  /* ==========================================================================
+     Base Styles
+     ========================================================================== */
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: var(--font-family-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--gray-700);
+    background-color: var(--gray-50);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Typography Improvements */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--gray-800);
+    margin-bottom: 0.75rem;
+  }
+  
+  .display-1, .display-2, .display-3, .display-4, .display-5, .display-6 {
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+  
+  p {
+    margin-bottom: 1rem;
+    color: var(--gray-600);
+  }
+  
+  .lead {
+    font-size: 1.125rem;
+    font-weight: 400;
+    color: var(--white);
+  }
+  
+  /* Code Styling */
+  code, pre {
+    font-family: var(--font-family-mono);
+    font-size: 0.875rem;
+  }
+  
+  code {
+    padding: 0.125rem 0.375rem;
+    background-color: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    color: var(--primary-700);
+    font-weight: 500;
+  }
+  
+  /* ==========================================================================
+     Layout Components
+     ========================================================================== */
+  
+  /* Enhanced Navbar */
+  .navbar {
+    background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-800) 100%) !important;
+    box-shadow: var(--shadow-md);
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--primary-600);
+  }
+  
+  .navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: white !important;
+    letter-spacing: -0.025em;
+  }
+  
+  .navbar-nav .nav-link {
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9) !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+    margin: 0 0.125rem;
+  }
+  
+  .navbar-nav .nav-link:hover,
+  .navbar-nav .nav-link:focus {
+    color: white !important;
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+  }
+  
+  .navbar-nav .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    color: white !important;
+  }
+  
+  .dropdown-menu {
+    border: none;
+    box-shadow: var(--shadow-xl);
+    border-radius: var(--radius-lg);
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background-color: white;
+  }
+  
+  .dropdown-item {
+    border-radius: var(--radius-md);
+    padding: 0.5rem 0.75rem;
+    font-weight: 500;
+    color: var(--gray-700);
+    transition: all 0.2s ease;
+  }
+  
+  .dropdown-item:hover,
+  .dropdown-item:focus {
+    background-color: var(--primary-50);
+    color: var(--primary-700);
+    transform: translateX(4px);
+  }
+  
+  .dropdown-divider {
+    margin: 0.5rem 0;
+    border-color: var(--gray-200);
+  }
+  
+  /* ==========================================================================
+     Cards and Content Containers
+     ========================================================================== */
+  
+  .card {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    background-color: white;
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+  
+  .card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+  }
+  
+  .card-header {
+    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+    border-bottom: 1px solid var(--gray-200);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0 !important;
+    padding: 1.25rem 1.5rem;
+    font-weight: 600;
+    color: var(--gray-800);
+  }
+  
+  .card-body {
+    padding: 1.5rem;
+  }
+  
+  .card-footer {
+    background-color: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    padding: 1rem 1.5rem;
+  }
+  
+  /* Feature Cards */
+  .feature-card {
+    height: 100%;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+  }
+  
+  .feature-card:hover {
+    border-color: var(--primary-200);
+    box-shadow: var(--shadow-xl);
+    transform: translateY(-4px);
+  }
+  
+  .feature-card .card-body {
+    text-align: center;
+    padding: 2rem 1.5rem;
+  }
+  
+  .feature-icon {
+    display: inline-block;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-200) 100%);
+    border-radius: 50%;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+  }
+  
+  .feature-card:hover .feature-icon {
+    transform: scale(1.1);
+    background: linear-gradient(135deg, var(--primary-200) 0%, var(--primary-300) 100%);
+  }
+  
+  /* ==========================================================================
+     Buttons and Form Elements
+     ========================================================================== */
+  
+  .btn {
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    border-width: 1px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    text-decoration: none;
+  }
+  
+  .btn:hover {
+    transform: translateY(-1px);
+    text-decoration: none;
+  }
+  
+  .btn:active {
+    transform: translateY(0);
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+    border-color: var(--primary-600);
+    color: white;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+    border-color: var(--primary-700);
+    box-shadow: var(--shadow-md);
+    color: white;
+  }
+  
+  .btn-success {
+    background: linear-gradient(135deg, var(--emerald-500) 0%, var(--emerald-600) 100%);
+    border-color: var(--emerald-600);
+    color: white;
+  }
+  
+  .btn-success:hover {
+    background: linear-gradient(135deg, var(--emerald-600) 0%, #047857 100%);
+    border-color: #047857;
+    color: white;
+  }
+  
+  .btn-outline-primary {
+    border-color: var(--primary-300);
+    color: var(--primary-600);
+    background-color: transparent;
+  }
+  
+  .btn-outline-primary:hover {
+    background-color: var(--primary-50);
+    border-color: var(--primary-500);
+    color: var(--primary-700);
+  }
+  
+  .btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    border-radius: var(--radius-sm);
+  }
+  
+  .btn-lg {
+    padding: 0.875rem 1.75rem;
+    font-size: 1rem;
+    border-radius: var(--radius-lg);
+  }
+  
+  /* Form Elements */
+  .form-control, .form-select {
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    background-color: white;
+    transition: all 0.2s ease;
+  }
+  
+  .form-control:focus, .form-select:focus {
+    border-color: var(--primary-400);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+  }
+  
+  .form-label {
+    font-weight: 500;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+  }
+  
+  .input-group-text {
+    background-color: var(--gray-100);
+    border-color: var(--gray-300);
+    color: var(--gray-600);
+  }
+  
+  /* ==========================================================================
+     Hero Section
+     ========================================================================== */
+  
+     .hero-section {
+        /* A more sophisticated dark gradient */
+        background: linear-gradient(145deg, var(--gray-800) 0%, var(--primary-900) 50%, var(--gray-900) 100%);
+        color: white;
+        padding-top: 4rem; /* Adjusted padding */
+        padding-bottom: 0; /* Stats are now inside */
+        position: relative;
+        overflow: hidden;
+    }
+      
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        /* A more subtle, bio-tech like pattern */
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><path d="M0 0h80v80H0z" fill="none"/><path d="M20 20h40v40H20z" fill="rgba(20, 184, 166, 0.04)"/><path d="M0 40h80M40 0v80" stroke="rgba(20, 184, 166, 0.06)" stroke-width="1"/></svg>');
+        opacity: 0.5; /* Reduced opacity */
+    }
+      
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        padding-bottom: 4rem; /* Space before stats */
+    }
+    .hero-section h1.display-4 {
+        /* 方案1：简单有效的亮色 */
+        color: var(--primary-100); /* 使用非常浅的青色，比纯白更柔和 */
+        font-weight: 700; /* 确保字体够粗 */
+    
+        /* 方案2 (推荐)：增加发光效果，提升质感 */
+        text-shadow: 0 0 15px rgba(45, 212, 191, 0.4); /* 使用主色调的半透明阴影来模拟光晕 */
+    
+        /* 方案3 (可选，效果酷炫)：渐变文字 */
+        /* 要使用这个方案，请取消下面4行代码的注释，并注释掉上面的 color 属性 */
+        /*
+        background: linear-gradient(135deg, var(--primary-200), var(--primary-400));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        */
+    }
+    /* Custom styles for Hero Buttons */
+    .hero-section .btn-primary {
+        background-color: var(--primary-500);
+        border-color: var(--primary-500);
+        color: white;
+    }
+    .hero-section .btn-primary:hover {
+        background-color: var(--primary-400);
+        border-color: var(--primary-400);
+        box-shadow: 0 4px 20px rgba(45, 212, 191, 0.25);
+    }
+    
+    .hero-section .btn-outline-primary {
+        border-color: var(--primary-500);
+        color: var(--primary-300);
+    }
+    .hero-section .btn-outline-primary:hover {
+        background-color: rgba(20, 184, 166, 0.1);
+        border-color: var(--primary-400);
+        color: var(--primary-200);
+    }
+      
+    /* The stats bar below the hero content */
+    .hero-stats {
+        background: rgba(15, 23, 42, 0.5); /* Use a dark, semi-transparent color */
+        border-radius: 0; /* Full width */
+        padding: 2rem 0;
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(20, 184, 166, 0.2);
+        position: relative;
+        z-index: 2;
+    }
+      
+    .hero-stat {
+        text-align: center;
+        padding: 1rem 0;
+    }
+      
+    .hero-stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-300); /* Use our new accent color */
+        display: block;
+        line-height: 1;
+    }
+      
+    .hero-stat-label {
+        font-size: 1rem;
+        color: var(--gray-300);
+        opacity: 0.9;
+        margin-top: 0.5rem;
+    }
+    
+  
+  /* ==========================================================================
+     Data Tables
+     ========================================================================== */
+  
+  .table-container {
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    border: 1px solid var(--gray-200);
+  }
+  
+  .table {
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  
+  .table thead th {
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+    border-bottom: 2px solid var(--gray-200);
+    font-weight: 600;
+    color: var(--gray-800);
+    padding: 1rem 1.25rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    border-top: none;
+  }
+  
+  .table tbody td {
+    padding: 1rem 1.25rem;
+    vertical-align: middle;
+    border-top: 1px solid var(--gray-100);
+    font-size: 0.875rem;
+  }
+  
+  .table tbody tr {
+    transition: all 0.2s ease;
+  }
+  
+  .table tbody tr:hover {
+    background-color: var(--primary-25, #fafbff);
+    transform: scale(1.001);
+  }
+  
+  .table tbody tr:first-child td {
+    border-top: none;
+  }
+  
+  /* DataTables Customization */
+  .dataTables_wrapper {
+    font-family: var(--font-family-sans);
+  }
+  
+  .dataTables_length select,
+  .dataTables_filter input {
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    padding: 0.375rem 0.75rem;
+  }
+  
+  .dataTables_info {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+  }
+  
+  .page-link {
+    border: 1px solid var(--gray-300);
+    color: var(--gray-600);
+    padding: 0.5rem 0.75rem;
+    margin: 0 0.125rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+  }
+  
+  .page-item.active .page-link {
+    background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+    border-color: var(--primary-600);
+    color: white;
+  }
+  
+  .page-link:hover {
+    background-color: var(--primary-50);
+    border-color: var(--primary-300);
+    color: var(--primary-700);
+  }
+  
+  /* ==========================================================================
+     Badges and Status Indicators
+     ========================================================================== */
+  
+  .badge {
+    font-weight: 500;
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-md);
+    letter-spacing: 0.025em;
+  }
+  
+  .badge-sm {
+    font-size: 0.6875rem;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .bg-primary {
+    background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%) !important;
+  }
+  
+  .bg-success {
+    background: linear-gradient(135deg, var(--emerald-500) 0%, var(--emerald-600) 100%) !important;
+  }
+  
+  .bg-warning {
+    background: linear-gradient(135deg, var(--amber-500) 0%, var(--amber-600) 100%) !important;
+  }
+  
+  .bg-info {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%) !important;
+  }
+  
+  /* Score Badges */
+  .score-badge {
+    font-family: var(--font-family-mono);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  .score-badge::before {
+    content: '●';
+    font-size: 0.625rem;
+  }
+  
+  .score-high {
+    background: linear-gradient(135deg, var(--emerald-500) 0%, var(--emerald-600) 100%);
+    color: white;
+  }
+  
+  .score-medium {
+    background: linear-gradient(135deg, var(--amber-500) 0%, var(--amber-600) 100%);
+    color: white;
+  }
+  
+  .score-low {
+    background: linear-gradient(135deg, var(--gray-400) 0%, var(--gray-500) 100%);
+    color: white;
+  }
+  
+  /* ==========================================================================
+     Alerts and Messages
+     ========================================================================== */
+  
+  .alert {
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid;
+  }
+  
+  .alert-info {
+    background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
+    border-left-color: #0288d1;
+    color: #01579b;
+  }
+  
+  .alert-success {
+    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+    border-left-color: var(--emerald-600);
+    color: #1b5e20;
+  }
+  
+  .alert-warning {
+    background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+    border-left-color: var(--amber-600);
+    color: #e65100;
+  }
+  
+  .alert-danger {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    border-left-color: var(--red-600);
+    color: #b71c1c;
+  }
+  
+  /* ==========================================================================
+     Molecular Visualization
+     ========================================================================== */
+  
+  .molecule-viewer {
+    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    min-height: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .structure-placeholder {
+    text-align: center;
+    color: var(--gray-500);
+  }
+  
+  .smiles-display {
+    background-color: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: 0.75rem;
+    font-family: var(--font-family-mono);
+    font-size: 0.875rem;
+    word-break: break-all;
+    position: relative;
+  }
+  
+  /* ==========================================================================
+     Property Cards
+     ========================================================================== */
+  
+  .property-card {
+    background: linear-gradient(135deg, white 0%, var(--gray-50) 100%);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    transition: all 0.2s ease;
+  }
+  
+  .property-card:hover {
+    border-color: var(--primary-300);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+  }
+  
+  .property-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-500);
+    margin-bottom: 0.25rem;
+  }
+  
+  .property-value {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--gray-800);
+  }
+  
+  /* ==========================================================================
+     Search Components
+     ========================================================================== */
+  
+  .search-card {
+    background: white;
+    border: 2px solid var(--primary-200);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+  
+  .search-input-group {
+    position: relative;
+  }
+  
+  .search-input-group .form-control {
+    border: none;
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+    background-color: transparent;
+  }
+  
+  .search-input-group .form-control:focus {
+    box-shadow: none;
+  }
+  
+  .search-suggestions {
+    padding: 1rem;
+    background-color: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+  }
+  
+  .search-example {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid var(--gray-300) !important;
+    background-color: white !important;
+    color: var(--gray-700) !important;
+  }
+  
+  .search-example:hover {
+    background-color: var(--primary-50) !important;
+    border-color: var(--primary-300) !important;
+    color: var(--primary-700) !important;
+    transform: translateY(-1px);
+  }
+  
+  /* ==========================================================================
+     Loading and Animation
+     ========================================================================== */
+  
+  .loading-spinner {
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid var(--gray-200);
+    border-top: 2px solid var(--primary-500);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    margin-right: 0.5rem;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Molecule Animation */
+  .molecule-animation {
+    animation: float 4s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(-10px) rotate(2deg); }
+    50% { transform: translateY(-20px) rotate(0deg); }
+    75% { transform: translateY(-10px) rotate(-2deg); }
+  }
+  
+  /* ==========================================================================
+     Statistics and Charts
+     ========================================================================== */
+  
+  .stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+  
+  .stat-card {
+    background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+    color: white;
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    transform: rotate(45deg);
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+  }
+  
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  
+  .stat-label {
+    font-size: 1rem;
+    opacity: 0.9;
+    font-weight: 500;
+  }
+  
+  /* Chart Containers */
+  .chart-container {
+    position: relative;
+    height: 300px;
+    margin: 1rem 0;
+  }
+  
+  /* ==========================================================================
+     Breadcrumbs
+     ========================================================================== */
+  
+  .breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin: 0 0 1.5rem 0;
+  }
+  
+  .breadcrumb-item {
+    font-size: 0.875rem;
+  }
+  
+  .breadcrumb-item + .breadcrumb-item::before {
+    color: var(--gray-400);
+    content: "›";
+    font-size: 1rem;
+  }
+  
+  .breadcrumb-item a {
+    color: var(--primary-600);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .breadcrumb-item a:hover {
+    color: var(--primary-700);
+  }
+  
+  .breadcrumb-item.active {
+    color: var(--gray-600);
+  }
+  
+  /* ==========================================================================
+     Footer
+     ========================================================================== */
+  
+  footer {
+    background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-900) 100%);
+    color: var(--gray-300);
+    border-top: 1px solid var(--gray-700);
+  }
+  
+  footer h5 {
+    color: white;
+    font-weight: 600;
+  }
+  
+  footer a {
+    color: var(--gray-300);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  footer a:hover {
+    color: white;
+  }
+  
+  /* ==========================================================================
+     Responsive Design
+     ========================================================================== */
+  
+  @media (max-width: 768px) {
+    .hero-section {
+      padding: 3rem 0;
+    }
+    
+    .hero-stat-number {
+      font-size: 2rem;
+    }
+    
+    .display-6 {
+      font-size: 1.75rem;
+    }
+    
+    .card-body {
+      padding: 1rem;
+    }
+    
+    .table-container {
+      border-radius: var(--radius-md);
+    }
+    
+    .stats-container {
+      grid-template-columns: 1fr;
+    }
+    
+    .btn-group-vertical .btn {
+      margin-bottom: 0.5rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .hero-section {
+      padding: 2rem 0;
+    }
+    
+    .navbar-brand {
+      font-size: 1.25rem;
+    }
+    
+    .btn-lg {
+      padding: 0.75rem 1.5rem;
+      font-size: 0.875rem;
+    }
+  }
+  
+  /* ==========================================================================
+     Utility Classes
+     ========================================================================== */
+  
+  .text-gradient {
+    background: linear-gradient(135deg, var(--primary-600) 0%, var(--purple-600) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 600;
+  }
+  
+  .border-gradient {
+    border: 2px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(135deg, var(--primary-400), var(--purple-400)) border-box;
+  }
+  
+  .bg-pattern {
+    background-image: radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                      radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+  }
+  
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --gray-50: #0f172a;
+      --gray-100: #1e293b;
+      --gray-200: #334155;
+      --gray-300: #475569;
+      --gray-800: #f1f5f9;
+      --gray-900: #f8fafc;
+    }
+    
+    body {
+      background-color: var(--gray-900);
+      color: var(--gray-100);
+    }
+  }
+  
+  /* Print styles */
+  @media print {
+    .navbar, .btn, footer {
+      display: none !important;
+    }
+    
+    .card {
+      border: 1px solid #000 !important;
+      box-shadow: none !important;
+    }
+    
+    body {
+      background: white !important;
+      color: black !important;
+    }
+  }
