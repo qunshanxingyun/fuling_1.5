@@ -2,142 +2,184 @@
 
 {% block title %}
 {% if target %}
-{{ target.gene_name or target.gene_symbol or '靶点' }} - 靶点详情
+{{ target.gene_name or target.gene_symbol or 'Target' }} - Target Details
 {% else %}
-靶点详情 - 茯苓靶点预测数据库
+Target Details - Poria Cocos Target Prediction Database
 {% endif %}
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
     {% if error %}
-    <!-- 错误页面 -->
+    <!-- Error Page -->
     <div class="row">
         <div class="col-12">
             <div class="alert alert-danger">
                 <h4 class="alert-heading">
-                    <i class="fas fa-exclamation-triangle me-2"></i>加载失败
+                    <i class="fas fa-exclamation-triangle me-2"></i>Failed to Load
                 </h4>
                 <p class="mb-0">{{ error }}</p>
                 <hr>
                 <a href="{{ url_for('targets_view.targets_list') }}" class="btn btn-outline-danger">
-                    <i class="fas fa-arrow-left me-1"></i>返回靶点列表
+                    <i class="fas fa-arrow-left me-1"></i>Back to Target List
                 </a>
             </div>
         </div>
     </div>
     {% elif target %}
     
-    <!-- 面包屑导航 -->
+    <!-- Breadcrumb Navigation -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('pages.index') }}">首页</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('targets_view.targets_list') }}">靶点</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('pages.index') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('targets_view.targets_list') }}">Targets</a></li>
             <li class="breadcrumb-item active">{{ target.gene_name or target.gene_symbol or 'Unknown' }}</li>
         </ol>
     </nav>
 
     <div class="row">
-        <!-- 左侧：靶点信息 -->
+        <!-- Left Side: Target Information -->
         <div class="col-lg-8">
-            <!-- 基本信息 -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3 class="card-title mb-0">
-                        <i class="fas fa-bullseye text-primary me-2"></i>
-                        {{ target.gene_name or '未知靶点' }}
-                    </h3>
+            
+            <!-- Basic Information Card - NEW REDESIGNED SECTION -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-gradient-primary text-white">
+                    <div class="d-flex align-items-center">
+                        <div class="target-icon me-3">
+                            <i class="fas fa-bullseye fa-2x"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h3 class="card-title mb-1 fw-bold">
+                                {{ target.gene_name or 'Unknown Target' }}
+                            </h3>
+                            {% if target.gene_symbol and target.gene_symbol != target.gene_name %}
+                            <p class="mb-0 opacity-90">{{ target.gene_symbol }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="species-badge">
+                            <span class="badge bg-light text-dark fs-6 px-3 py-2">
+                                <i class="fas fa-dna me-2"></i>
+                                {{ target.species or 'Homo sapiens' }}
+                            </span>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
-                    {% if target.gene_symbol and target.gene_symbol != target.gene_name %}
-                    <h5 class="text-muted mb-3">基因符号: {{ target.gene_symbol }}</h5>
-                    {% endif %}
-                    
-                    <div class="row">
+                    <div class="row g-4">
+                        <!-- UniProt ID -->
+                        {% if target.uniprot_id %}
                         <div class="col-md-6">
-                            <table class="table table-sm">
-                                <tr>
-                                    <th width="30%">基因名称:</th>
-                                    <td>{{ target.gene_name or 'N/A' }}</td>
-                                </tr>
-                                <tr>
-                                    <th>基因符号:</th>
-                                    <td>{{ target.gene_symbol or 'N/A' }}</td>
-                                </tr>
-                                <tr>
-                                    <th>物种:</th>
-                                    <td>{{ target.species or 'Homo sapiens' }}</td>
-                                </tr>
-                                {% if target.uniprot_id %}
-                                <tr>
-                                    <th>UniProt ID:</th>
-                                    <td>
-                                        <a href="https://www.uniprot.org/uniprot/{{ target.uniprot_id }}" target="_blank">
-                                            {{ target.uniprot_id }} <i class="fas fa-external-link-alt small"></i>
+                            <div class="info-item">
+                                <div class="info-icon bg-success-soft"><i class="fas fa-database text-success"></i></div>
+                                <div class="info-content">
+                                    <label class="info-label">UniProt ID</label>
+                                    <div class="info-value">
+                                        <a href="https://www.uniprot.org/uniprot/{{ target.uniprot_id }}" target="_blank" class="btn btn-outline-success btn-sm">
+                                            <span class="fw-bold">{{ target.uniprot_id }}</span>
+                                            <i class="fas fa-external-link-alt ms-2"></i>
                                         </a>
-                                    </td>
-                                </tr>
-                                {% endif %}
-                            </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                        {% endif %}
+
+                        <!-- Gene Symbol -->
                         <div class="col-md-6">
-                            <table class="table table-sm">
-                                <tr>
-                                    <th width="30%">预测次数:</th>
-                                    <td>
-                                        <span class="badge bg-primary">
-                                            {{ target.prediction_count or 0 }}
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>平均得分:</th>
-                                    <td>
-                                        {% if target.avg_score %}
-                                            <span class="badge bg-success">
-                                                {{ "%.4f"|format(target.avg_score) }}
-                                            </span>
-                                        {% else %}
-                                            N/A
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>化合物数量:</th>
-                                    <td>{{ target.compound_count or 0 }}</td>
-                                </tr>
-                            </table>
+                             <div class="info-item">
+                                <div class="info-icon bg-primary-soft"><i class="fas fa-fingerprint text-primary"></i></div>
+                                <div class="info-content">
+                                    <label class="info-label">Gene Symbol</label>
+                                    <div class="info-value">
+                                        <span class="badge bg-primary fs-6 px-3 py-2">{{ target.gene_symbol or 'N/A' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Prediction Count -->
+                        <div class="col-md-6">
+                             <div class="info-item">
+                                <div class="info-icon bg-info-soft"><i class="fas fa-calculator text-info"></i></div>
+                                <div class="info-content">
+                                    <label class="info-label">Prediction Count</label>
+                                    <div class="info-value fw-bold fs-5">{{ target.prediction_count or 0 }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Average Score -->
+                         <div class="col-md-6">
+                             <div class="info-item">
+                                <div class="info-icon bg-warning-soft"><i class="fas fa-star-half-alt text-warning"></i></div>
+                                <div class="info-content">
+                                    <label class="info-label">Average Score</label>
+                                    <div class="info-value fw-bold fs-5">
+                                        {% if target.avg_score %}{{ "%.4f"|format(target.avg_score) }}{% else %}N/A{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Related Compounds -->
+                         <div class="col-md-6">
+                             <div class="info-item">
+                                <div class="info-icon bg-danger-soft"><i class="fas fa-atom text-danger"></i></div>
+                                <div class="info-content">
+                                    <label class="info-label">Related Compounds</label>
+                                    <div class="info-value fw-bold fs-5">{{ target.compound_count or 0 }}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 功能注释 -->
+            <style>
+            /* Custom styles for improved target card */
+            .bg-gradient-primary { background: linear-gradient(135deg, #0d6efd, #0a58ca); }
+            .info-item { display: flex; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: .5rem; border-left: 4px solid #0d6efd; transition: all 0.2s ease; }
+            .info-item:hover { background: white; box-shadow: 0 .125rem .25rem rgba(0,0,0,.075); transform: translateY(-1px); }
+            .info-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: white; border-radius: 50%; margin-right: 1rem; box-shadow: 0 .125rem .25rem rgba(0,0,0,.075); }
+            .bg-primary-soft { background-color: rgba(13, 110, 253, 0.1); }
+            .bg-success-soft { background-color: rgba(25, 135, 84, 0.1); }
+            .bg-info-soft { background-color: rgba(13, 202, 240, 0.1); }
+            .bg-warning-soft { background-color: rgba(255, 193, 7, 0.1); }
+            .bg-danger-soft { background-color: rgba(220, 53, 69, 0.1); }
+            .info-content { flex: 1; }
+            .info-label { display: block; font-size: 0.875rem; font-weight: 500; color: #6c757d; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.5px; }
+            .info-value { font-size: 1rem; font-weight: 600; color: #212529; }
+            .target-icon { width: 60px; height: 60px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+            .species-badge .badge { border-radius: 25px; font-weight: 500; }
+            </style>
+            <!-- END OF REDESIGNED SECTION -->
+
+            <!-- Functional Annotation -->
             {% if target.function_cc or target.protein_names %}
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="card-title mb-0">
-                        <i class="fas fa-info-circle me-2"></i>功能注释
+                        <i class="fas fa-info-circle me-2"></i>Functional Annotation
                     </h5>
                 </div>
                 <div class="card-body">
                     {% if target.protein_names %}
                     <div class="mb-3">
-                        <strong>蛋白质名称:</strong>
+                        <strong>Protein Names:</strong>
                         <p class="mt-1">{{ target.protein_names }}</p>
                     </div>
                     {% endif %}
                     
                     {% if target.function_cc %}
                     <div class="mb-3">
-                        <strong>功能描述:</strong>
+                        <strong>Function Description:</strong>
                         <p class="mt-1">{{ target.function_cc }}</p>
                     </div>
                     {% endif %}
                     
                     {% if target.subcellular_location_cc %}
                     <div class="mb-3">
-                        <strong>亚细胞定位:</strong>
+                        <strong>Subcellular Location:</strong>
                         <p class="mt-1">{{ target.subcellular_location_cc }}</p>
                     </div>
                     {% endif %}
@@ -146,12 +188,12 @@
             {% endif %}
         </div>
 
-        <!-- 右侧：相关化合物 -->
+        <!-- Right Side: Related Compounds -->
         <div class="col-lg-4">
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">
-                        <i class="fas fa-atom me-2"></i>相关化合物
+                        <i class="fas fa-atom me-2"></i>Related Compounds
                         <span id="compoundCount" class="badge bg-primary ms-2">-</span>
                     </h5>
                 </div>
@@ -159,9 +201,9 @@
                     <div id="compoundsContainer">
                         <div class="text-center">
                             <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">加载中...</span>
+                                <span class="visually-hidden">Loading...</span>
                             </div>
-                            <p class="mt-2 text-muted">正在加载相关化合物...</p>
+                            <p class="mt-2 text-muted">Loading related compounds...</p>
                         </div>
                     </div>
                 </div>
@@ -170,17 +212,17 @@
     </div>
 
     {% else %}
-    <!-- 靶点未找到 -->
+    <!-- Target Not Found -->
     <div class="row">
         <div class="col-12">
             <div class="alert alert-warning">
                 <h4 class="alert-heading">
-                    <i class="fas fa-exclamation-triangle me-2"></i>靶点未找到
+                    <i class="fas fa-exclamation-triangle me-2"></i>Target Not Found
                 </h4>
-                <p class="mb-0">请检查基因名称是否正确，或返回列表页面重新选择。</p>
+                <p class="mb-0">Please check if the gene name is correct, or return to the list page to select again.</p>
                 <hr>
                 <a href="{{ url_for('targets_view.targets_list') }}" class="btn btn-outline-warning">
-                    <i class="fas fa-arrow-left me-1"></i>返回靶点列表
+                    <i class="fas fa-arrow-left me-1"></i>Back to Target List
                 </a>
             </div>
         </div>
@@ -192,7 +234,7 @@
 {% block extra_js %}
 {% if target %}
 <script>
-// 页面数据传递给JavaScript
+// Pass page data to JavaScript
 window.targetData = {{ target | tojson | safe }};
 </script>
 <script src="{{ url_for('static', filename='js/targets.js') }}"></script>

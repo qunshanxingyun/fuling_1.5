@@ -1,0 +1,4 @@
+ID, SMILES
+compound_1, CCO
+compound_2, CC(C)O
+compound_3, CC1=C[C@H]2[C@@H](CC[C@]([C@H]2CC1)(C)O)C(C)C

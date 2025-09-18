@@ -1,32 +1,42 @@
 茯苓靶点预测数据库/
 ├── README.md
+├── tree.txt                          # 项目文件树（本文件）
 ├── requirements.txt
 ├── app.py                          # Flask应用入口
 ├── config.py                       # 配置文件
 ├── .gitignore
 │
-├── api/                           # API接口层（已存在）
+├── api/                           # API接口层(含DTI预测逻辑)
 │   ├── __init__.py
 │   ├── compounds.py              # 化合物API
 │   └── targets.py                # 靶点API
+│   └── result                # 预训练drugban模型
+│   └── ban.py
+│   └── configs.py
+│   └── models.py
+│   └── prediction.py
+│   └── predictor.py
+│   └── process.py
+│   └── utils.py
 │
 ├── views/                         # 页面视图层
 │   ├── __init__.py
 │   ├── pages.py                  # 主要页面控制器
 │   ├── compounds.py              # 化合物页面控制器
 │   └── targets.py                # 靶点页面控制器
+│   └── prediction.py                # DTI预测页面控制器
 │
-├── models/                        # 数据模型层（已存在）
+├── models/                        # 数据模型层
 │   ├── __init__.py
 │   ├── compound.py               # 化合物模型
 │   └── target.py                 # 靶点模型
 │
-├── services/                      # 业务逻辑层（已存在）
+├── services/                      # 业务逻辑层
 │   ├── __init__.py
 │   ├── compound_service.py       # 化合物服务
 │   └── target_service.py         # 靶点服务
 │
-├── utils/                         # 工具类（已存在）
+├── utils/                         # 工具类
 │   ├── __init__.py
 │   ├── pagination.py             # 分页工具
 │   └── cache.py                  # 缓存工具
@@ -39,7 +49,8 @@
 │   │   ├── index.html            # 首页（已完成）
 │   │   ├── search.html           # 全局搜索页
 │   │   ├── statistics.html           # 数据统计页
-│   │   ├── compare.html           # 化合物对比页
+│   │   ├── predict.html           # DTI预测页
+│   │   ├── prediction_results.html           # DTI预测结果页
 │   │   └── help.html             # 帮助页
 │   ├── compounds/                # 化合物页面
 │   │   ├── list.html             # 化合物列表
@@ -52,16 +63,16 @@
 │
 ├── static/                        # 静态文件
 │   ├── css/                      # 样式文件
-│   │   └── custom.css            # 自定义样式（已完成）
+│   │   └── custom.css            # 自定义样式
 │   ├── js/                       # JavaScript文件
-│   │   ├── app.js                # 应用主脚本（已完成）
-│   │   ├── index.js              # 首页脚本（已完成）
-│   │   ├── compounds.js          # 化合物模块脚本（待开发）
-│   │   └── targets.js            # 靶点模块脚本（待开发）
-│   └── images/                   # 图片文件
-│       └── favicon.ico           # 网站图标
+│   │   ├── app.js                # 应用主脚本
+│   │   ├── index.js              # 首页脚本
+│   │   ├── compounds.js          # 化合物模块脚本
+│   │   └── targets.js            # 靶点模块脚本
+│   │   └── predict.js            # DTI预测模块脚本
+│   │   └── prediction_results.js            # DTI预测结果模块脚本
 │
-└── data/                          # 数据文件（已存在）
+└── data/                          # 数据文件
     ├── compounds.csv             # 化合物数据
     ├── targets.xlsx              # 靶点数据
     ├── huifayou/                 # 挥发油预测结果
