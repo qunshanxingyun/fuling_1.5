@@ -218,3 +218,93 @@ class Target:
                             continue
         
         return compounds
+    
+    def get_all_unique_targets(self) -> pd.DataFrame:
+        """Enhanced: Get all unique targets with better data aggregation"""
+        all_targets = []
+        
+        # From all prediction files collect targets with enhanced processing
+        for compound_type, dir_path in self.prediction_dirs.items():
+            if os.path.exists(dir_path):
+                for file in os.listdir(dir_path):
+                    if file.endswith('.xlsx'):
+                        try:
+                            df = pd.read_excel(os.path.join(dir_path, file))
+                            if not df.empty and 'From' in df.columns:
+                                df['source_type'] = compound_type
+                                df['source_file'] = file
+                                # Add standardized gene_symbol
+                                df['gene_symbol'] = df['From'].apply(self._get_gene_symbol_from_name)
+                                
+                                # Ensure score column is numeric
+                                if 'score' in df.columns:
+                                    df['score'] = pd.to_numeric(df['score'], errors='coerce')
+                                
+                                all_targets.append(df)
+                        except Exception as e:
+                            print(f"Error reading {file}: {str(e)}")
+                            continue
+        
+        if all_targets:
+            combined_df = pd.concat(all_targets, ignore_index=True)
+            
+            # Enhanced aggregation with better statistics
+            valid_targets = combined_df[combined_df['gene_symbol'].notna()]
+            
+            if valid_targets.empty:
+                return pd.DataFrame()
+            
+            # Group by gene_symbol and calculate comprehensive statistics
+            target_stats = valid_targets.groupby('gene_symbol').agg({
+                'score': ['mean', 'max', 'min', 'count', 'std'],
+                'source_type': lambda x: list(set(x)),
+                'source_file': 'nunique',  # Number of unique files (compounds)
+                'From': 'first'  # Keep original From value
+            }).reset_index()
+            
+            # Flatten multi-level columns
+            target_stats.columns = [
+                'gene_symbol', 'avg_score', 'max_score', 'min_score', 
+                'prediction_count', 'score_std', 'compound_types', 
+                'compound_count', 'from_name'
+            ]
+            
+            # Clean up data types and handle NaN values
+            numeric_cols = ['avg_score', 'max_score', 'min_score', 'prediction_count', 'compound_count']
+            for col in numeric_cols:
+                target_stats[col] = pd.to_numeric(target_stats[col], errors='coerce').fillna(0)
+            
+            # Merge with target base information if available
+            if not self._targets_df.empty:
+                target_stats = pd.merge(
+                    target_stats, 
+                    self._targets_df, 
+                    on='gene_symbol', 
+                    how='left'
+                )
+                
+                # Fill missing gene_name with gene_symbol
+                if 'gene_name' in target_stats.columns:
+                    target_stats['gene_name'] = target_stats['gene_name'].fillna(target_stats['gene_symbol'])
+            else:
+                # If no base info, use gene_symbol as gene_name
+                target_stats['gene_name'] = target_stats['gene_symbol']
+            
+            # Add species column if missing
+            if 'species' not in target_stats.columns:
+                target_stats['species'] = 'Homo sapiens'
+            
+            # Ensure all required columns exist with proper defaults
+            required_columns = {
+                'uniprot_id': '',
+                'protein_names': '',
+                'function_cc': ''
+            }
+            
+            for col, default_val in required_columns.items():
+                if col not in target_stats.columns:
+                    target_stats[col] = default_val
+            
+            return target_stats
+        
+        return pd.DataFrame()

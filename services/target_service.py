@@ -53,14 +53,13 @@ class TargetService:
         }
     
     def get_targets_list(self,
-                        page: int = 1,
-                        page_size: int = 20,
-                        # gene_family: Optional[str] = None,
-                        search: Optional[str] = None,
-                        sort_by: str = 'prediction_count',
-                        sort_order: str = 'desc') -> Dict:
-        """获取靶点列表（带分页）"""
-        # 获取所有独特靶点
+                    page: int = 1,
+                    page_size: int = 20,
+                    search: Optional[str] = None,
+                    sort_by: str = 'prediction_count',
+                    sort_order: str = 'desc') -> Dict:
+        """Enhanced targets list with proper data loading"""
+        # Get all unique targets with enhanced data processing
         targets_df = self.target_model.get_all_unique_targets()
         
         if targets_df.empty:
@@ -74,11 +73,17 @@ class TargetService:
                 }
             }
         
-        # 应用搜索
+        # Debug: Print columns to see what data we have
+        print(f"DEBUG: Available columns: {targets_df.columns.tolist()}")
+        print(f"DEBUG: Sample data shape: {targets_df.shape}")
+        if not targets_df.empty:
+            print(f"DEBUG: First row sample: {targets_df.iloc[0].to_dict()}")
+        
+        # Apply search
         if search:
-            # 在多个字段中搜索
+            # Search in multiple fields with case-insensitive matching
             mask = pd.Series([False] * len(targets_df))
-            search_fields = ['gene_name', 'gene_symbol', 'protein_names', 'function_cc']
+            search_fields = ['gene_name', 'gene_symbol', 'protein_names', 'function_cc', 'uniprot_id']
             
             for field in search_fields:
                 if field in targets_df.columns:
@@ -86,47 +91,59 @@ class TargetService:
             
             targets_df = targets_df[mask]
         
-        # 应用基因家族筛选
-        # if gene_family and gene_family != 'all':
-        #     if gene_family == 'UGT':
-        #         targets_df = targets_df[targets_df['gene_name'].str.contains('UGT', na=False)]
-        #     elif gene_family == 'CYP450':
-        #         targets_df = targets_df[targets_df['gene_name'].str.contains('CYP', na=False)]
-        #     elif gene_family == 'Others':
-        #         targets_df = targets_df[
-        #             ~targets_df['gene_name'].str.contains('UGT|CYP', na=False)
-        #         ]
+        # Ensure numeric columns are properly typed
+        numeric_columns = ['prediction_count', 'avg_score', 'max_score', 'min_score', 'compound_count']
+        for col in numeric_columns:
+            if col in targets_df.columns:
+                targets_df[col] = pd.to_numeric(targets_df[col], errors='coerce').fillna(0)
         
-        # 应用排序
+        # Apply sorting
         if sort_by in targets_df.columns:
             ascending = (sort_order == 'asc')
             targets_df = targets_df.sort_values(by=sort_by, ascending=ascending)
         
-        # 分页
+        # Apply pagination
         paginated_df, pagination_info = self.paginator.paginate_dataframe(
             targets_df, page, page_size
         )
         
-        # 选择要返回的字段
+        # Select and prepare display columns
         display_columns = [
             'gene_name', 'gene_symbol', 'species', 'prediction_count',
-            'compound_count', 'avg_score', 'uniprot_id', 'protein_names'
+            'compound_count', 'avg_score', 'max_score', 'min_score',
+            'uniprot_id', 'protein_names', 'function_cc'
         ]
         
-        # 确保列存在
+        # Ensure columns exist and prepare data
         available_columns = [col for col in display_columns if col in paginated_df.columns]
         
-        # 转换为字典列表
-        items = paginated_df[available_columns].fillna('').to_dict('records')
-        
-        # 格式化数值字段
-        for item in items:
-            if 'avg_score' in item and item['avg_score']:
-                item['avg_score'] = round(float(item['avg_score']), 4)
-            if 'prediction_count' in item and item['prediction_count']:
-                item['prediction_count'] = int(item['prediction_count'])
-            if 'compound_count' in item and item['compound_count']:
-                item['compound_count'] = int(item['compound_count'])
+        # Convert to dictionary list with enhanced data formatting
+        items = []
+        for _, row in paginated_df.iterrows():
+            item = {}
+            for col in available_columns:
+                value = row[col]
+                
+                # Handle NaN and None values
+                if pd.isna(value) or value is None:
+                    if col in numeric_columns:
+                        item[col] = 0
+                    else:
+                        item[col] = ''
+                else:
+                    # Format numeric values
+                    if col in ['avg_score', 'max_score', 'min_score'] and value != 0:
+                        item[col] = float(value)
+                    elif col in ['prediction_count', 'compound_count']:
+                        item[col] = int(value) if value != 0 else 0
+                    else:
+                        item[col] = str(value) if value else ''
+            
+            # Ensure minimum required fields exist
+            if 'gene_name' not in item or not item['gene_name']:
+                item['gene_name'] = item.get('gene_symbol', 'Unknown')
+            
+            items.append(item)
         
         return {
             'items': items,
@@ -207,3 +224,36 @@ class TargetService:
             'species_distribution': species_dist,
             'top_predicted_targets': top_targets
         }
+    
+    
+    # Add this method to the existing TargetService class in services/target_service.py
+
+    def get_targets_count(self, search: Optional[str] = None) -> int:
+        """
+        Get total count of targets matching search criteria
+        
+        Args:
+            search: Search keyword
+            
+        Returns:
+            int: Total count of targets
+        """
+        # Get all unique targets
+        targets_df = self.target_model.get_all_unique_targets()
+        
+        if targets_df.empty:
+            return 0
+        
+        # Apply search if provided
+        if search:
+            # Search in multiple fields
+            mask = pd.Series([False] * len(targets_df))
+            search_fields = ['gene_name', 'gene_symbol', 'protein_names', 'function_cc']
+            
+            for field in search_fields:
+                if field in targets_df.columns:
+                    mask |= targets_df[field].astype(str).str.contains(search, case=False, na=False)
+            
+            targets_df = targets_df[mask]
+        
+        return len(targets_df)

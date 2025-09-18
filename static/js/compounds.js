@@ -35,30 +35,22 @@ function initializeCompoundsListPage() {
 }
 
 /**
- * Initialize DataTables
+ * Initialize DataTables with fixed pagination
  */
 function initializeDataTable() {
     compoundsTable = $('#compoundsTable').DataTable({
         processing: true,
         serverSide: true,
         ajax: {
-            url: '/api/compounds',
+            // Fixed: Use the correct endpoint that returns DataTables format
+            url: '/compounds/api/list',
             type: 'GET',
             data: function(d) {
-                // Convert DataTables parameters to our API format
-                return {
-                    page: Math.floor(d.start / d.length) + 1,
-                    page_size: d.length,
-                    type: document.getElementById('typeFilter').value !== 'all' ? 
-                          document.getElementById('typeFilter').value : null,
-                    search: document.getElementById('searchInput').value || null,
-                    sort_by: getColumnName(d.order[0].column),
-                    sort_order: d.order[0].dir
-                };
-            },
-            dataSrc: function(json) {
-                // Convert our API response to DataTables format
-                return json.data.items || [];
+                // Add custom filter parameters to DataTables request
+                d.compound_type = document.getElementById('typeFilter').value !== 'all' ? 
+                                 document.getElementById('typeFilter').value : null;
+                d.search_custom = document.getElementById('searchInput').value || null;
+                return d;
             },
             error: function(xhr, error, thrown) {
                 console.error('DataTable error:', error);
@@ -137,11 +129,24 @@ function initializeDataTable() {
             }
         ],
         pageLength: 20,
-        lengthMenu: [[10, 20, 50], [10, 20, 50]],
+        lengthMenu: [[10, 20, 50, 100], [10, 20, 50, 100]],
         language: {
-            url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/en.json'
+            url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/en.json',
+            processing: "Loading compounds...",
+            search: "Search compounds:",
+            lengthMenu: "Show _MENU_ compounds per page",
+            info: "Showing _START_ to _END_ of _TOTAL_ compounds",
+            infoEmpty: "No compounds found",
+            infoFiltered: "(filtered from _MAX_ total compounds)",
+            paginate: {
+                first: "First",
+                last: "Last",
+                next: "Next",
+                previous: "Previous"
+            }
         },
-        order: [[0, 'asc']]
+        order: [[0, 'asc']],
+        responsive: true
     });
 }
 
@@ -149,7 +154,7 @@ function initializeDataTable() {
  * Bind list page events
  */
 function bindListPageEvents() {
-    // Filter changes
+    // Filter changes - reload table when type filter changes
     document.getElementById('typeFilter').addEventListener('change', function() {
         compoundsTable.ajax.reload();
     });
@@ -169,17 +174,6 @@ function bindListPageEvents() {
             compoundsTable.ajax.reload();
         }, 500);
     });
-}
-
-/**
- * Get column name
- */
-function getColumnName(columnIndex) {
-    const columnNames = [
-        'global_id', 'chinese_name', 'Name', 'compound_type', 
-        'Molecular_Formula', 'Molecular_Weight', null
-    ];
-    return columnNames[columnIndex] || 'global_id';
 }
 
 /**

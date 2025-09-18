@@ -1,12 +1,12 @@
 /**
- * 靶点模块JavaScript - 处理列表和详情页面的所有功能
+ * Targets Module JavaScript - Handles list and detail page functionality
  */
 
 let targetsTable = null;
 
-// 页面加载完成后初始化
+// Initialize after page load
 document.addEventListener('DOMContentLoaded', function() {
-    // 根据当前页面初始化相应功能
+    // Initialize appropriate functionality based on current page
     if (document.getElementById('targetsTable')) {
         initializeTargetsListPage();
     }
@@ -17,87 +17,87 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /**
- * 初始化靶点列表页面
+ * Initialize targets list page
  */
 function initializeTargetsListPage() {
     initializeDataTable();
     bindListPageEvents();
     
-    // 设置初始筛选值
-    if (window.pageConfig) {
-        // if (window.pageConfig.geneFamily && window.pageConfig.geneFamily !== 'all') {
-        //     document.getElementById('familyFilter').value = window.pageConfig.geneFamily;
-        // }
-        if (window.pageConfig.searchQuery) {
-            document.getElementById('searchInput').value = window.pageConfig.searchQuery;
-        }
+    // Set initial search value
+    if (window.pageConfig && window.pageConfig.searchQuery) {
+        document.getElementById('searchInput').value = window.pageConfig.searchQuery;
     }
 }
 
 /**
- * 初始化DataTables
+ * Initialize DataTables with fixed pagination and data loading
  */
 function initializeDataTable() {
     targetsTable = $('#targetsTable').DataTable({
         processing: true,
         serverSide: true,
         ajax: {
-            url: '/api/targets',
+            // Fixed: Use the correct endpoint that returns DataTables format
+            url: '/targets/api/list',
             type: 'GET',
             data: function(d) {
-                // 转换DataTables参数为我们的API格式
-                return {
-                    page: Math.floor(d.start / d.length) + 1,
-                    page_size: d.length,
-                    // gene_family: document.getElementById('familyFilter').value !== 'all' ? 
-                    //             document.getElementById('familyFilter').value : null,
-                    search: document.getElementById('searchInput').value || null,
-                    sort_by: getColumnName(d.order[0].column),
-                    sort_order: d.order[0].dir
-                };
-            },
-            dataSrc: function(json) {
-                // 转换我们的API响应为DataTables格式
-                return json.data.items || [];
+                // Add custom search parameter
+                d.search_custom = document.getElementById('searchInput').value || null;
+                return d;
             },
             error: function(xhr, error, thrown) {
                 console.error('DataTable error:', error);
-                Utils.showToast('数据加载失败', 'error');
+                Utils.showToast('Failed to load targets data', 'error');
             }
         },
         columns: [
             {
                 data: 'gene_name',
-                title: '基因名称',
+                title: 'Gene Name',
                 render: function(data, type, row) {
-                    return data || row.gene_symbol || '<span class="text-muted">Unknown</span>';
+                    const geneName = data || row.gene_symbol || 'Unknown';
+                    return `<span class="fw-medium">${geneName}</span>`;
                 }
             },
             {
                 data: 'gene_symbol',
-                title: '基因符号',
+                title: 'Gene Symbol',
                 width: '120px',
                 render: function(data) {
-                    return data ? `<code>${data}</code>` : '<span class="text-muted">N/A</span>';
+                    return data ? `<code class="text-primary">${data}</code>` : '<span class="text-muted">N/A</span>';
                 }
             },
             {
                 data: 'prediction_count',
-                title: '预测次数',
-                width: '100px',
+                title: 'Prediction Count',
+                width: '140px',
                 render: function(data) {
-                    return data ? `<span class="badge bg-primary">${data}</span>` : '0';
+                    if (!data || data === 0) {
+                        return '<span class="text-muted">-</span>';
+                    }
+                    let badgeClass = 'secondary';
+                    if (data >= 50) badgeClass = 'success';
+                    else if (data >= 20) badgeClass = 'info';
+                    else if (data >= 10) badgeClass = 'warning';
+                    
+                    return `<span class="badge bg-${badgeClass} fs-6">${data}</span>`;
                 }
             },
             {
                 data: 'avg_score',
-                title: '平均得分',
-                width: '120px',
+                title: 'Average Score',
+                width: '140px',
                 render: function(data) {
-                    if (!data) return '<span class="text-muted">N/A</span>';
+                    if (!data || data === 0) {
+                        return '<span class="text-muted">-</span>';
+                    }
                     const score = parseFloat(data);
-                    const scoreClass = score >= 0.95 ? 'success' : score >= 0.90 ? 'warning' : 'secondary';
-                    return `<span class="badge bg-${scoreClass}">${score.toFixed(4)}</span>`;
+                    let scoreClass = 'secondary';
+                    if (score >= 0.95) scoreClass = 'success';
+                    else if (score >= 0.90) scoreClass = 'warning';
+                    else if (score >= 0.80) scoreClass = 'info';
+                    
+                    return `<span class="badge bg-${scoreClass} fs-6">${score.toFixed(4)}</span>`;
                 }
             },
             {
@@ -107,23 +107,23 @@ function initializeDataTable() {
                 render: function(data) {
                     if (!data) return '<span class="text-muted">N/A</span>';
                     return `<a href="https://www.uniprot.org/uniprot/${data}" target="_blank" class="text-decoration-none">
-                        ${data} <i class="fas fa-external-link-alt small"></i>
+                        ${data} <i class="fas fa-external-link-alt small text-muted"></i>
                     </a>`;
                 }
             },
             {
                 data: null,
-                title: '操作',
+                title: 'Actions',
                 orderable: false,
-                width: '100px',
+                width: '120px',
                 render: function(data, type, row) {
                     const geneName = row.gene_symbol || row.gene_name || 'unknown';
                     return `
                         <div class="btn-group btn-group-sm">
-                            <button class="btn btn-outline-primary" onclick="viewTarget('${geneName}')" title="查看详情">
+                            <button class="btn btn-outline-primary" onclick="viewTarget('${geneName}')" title="View Details">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button class="btn btn-outline-success" onclick="viewCompounds('${geneName}')" title="相关化合物">
+                            <button class="btn btn-outline-success" onclick="viewCompounds('${geneName}')" title="Related Compounds">
                                 <i class="fas fa-atom"></i>
                             </button>
                         </div>
@@ -132,31 +132,39 @@ function initializeDataTable() {
             }
         ],
         pageLength: 20,
-        lengthMenu: [[10, 20, 50], [10, 20, 50]],
+        lengthMenu: [[10, 20, 50, 100], [10, 20, 50, 100]],
         language: {
-            url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/zh.json'
+            url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/en.json',
+            processing: "Loading targets...",
+            search: "Search targets:",
+            lengthMenu: "Show _MENU_ targets per page",
+            info: "Showing _START_ to _END_ of _TOTAL_ targets",
+            infoEmpty: "No targets found",
+            infoFiltered: "(filtered from _MAX_ total targets)",
+            paginate: {
+                first: "First",
+                last: "Last",
+                next: "Next",
+                previous: "Previous"
+            }
         },
-        order: [[2, 'desc']] // 按预测次数降序排列
+        order: [[2, 'desc']], // Sort by prediction count descending
+        responsive: true
     });
 }
 
 /**
- * 绑定列表页面事件
+ * Bind list page events
  */
 function bindListPageEvents() {
-    // 筛选器变化
-    // document.getElementById('familyFilter').addEventListener('change', function() {
-    //     targetsTable.ajax.reload();
-    // });
-    
-    // 搜索输入框回车
+    // Search input enter key
     document.getElementById('searchInput').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             targetsTable.ajax.reload();
         }
     });
     
-    // 实时搜索（防抖）
+    // Real-time search (debounced)
     let searchTimeout;
     document.getElementById('searchInput').addEventListener('input', function() {
         clearTimeout(searchTimeout);
@@ -164,42 +172,37 @@ function bindListPageEvents() {
             targetsTable.ajax.reload();
         }, 500);
     });
+    
+    // Clear search button
+    document.getElementById('clearSearch').addEventListener('click', function() {
+        document.getElementById('searchInput').value = '';
+        targetsTable.ajax.reload();
+    });
 }
 
 /**
- * 获取列名
- */
-function getColumnName(columnIndex) {
-    const columnNames = [
-        'gene_name', 'gene_symbol', 'prediction_count', 'avg_score', 
-        'uniprot_id', null
-    ];
-    return columnNames[columnIndex] || 'prediction_count';
-}
-
-/**
- * 查看靶点详情
+ * View target details
  */
 function viewTarget(geneName) {
     window.location.href = `/targets/${encodeURIComponent(geneName)}`;
 }
 
 /**
- * 查看相关化合物
+ * View related compounds
  */
 function viewCompounds(geneName) {
     window.location.href = `/targets/${encodeURIComponent(geneName)}#compounds`;
 }
 
 /**
- * 初始化靶点详情页面
+ * Initialize target detail page
  */
 function initializeTargetDetailPage() {
     loadCompoundsData();
 }
 
 /**
- * 加载相关化合物数据
+ * Load related compounds data
  */
 async function loadCompoundsData() {
     const container = document.getElementById('compoundsContainer');
@@ -210,11 +213,11 @@ async function loadCompoundsData() {
     try {
         let compounds = [];
         
-        // 如果已有数据就直接使用
+        // If data is already available, use it directly
         if (window.targetData.associated_compounds) {
             compounds = window.targetData.associated_compounds;
         } else {
-            // 否则通过API获取
+            // Otherwise get data through API
             const geneName = window.targetData.gene_symbol || window.targetData.gene_name;
             const response = await apiClient.get(`/targets/${encodeURIComponent(geneName)}/compounds`);
             compounds = response.data.compounds || [];
@@ -227,7 +230,7 @@ async function loadCompoundsData() {
         container.innerHTML = `
             <div class="alert alert-danger">
                 <i class="fas fa-exclamation-triangle me-2"></i>
-                加载相关化合物失败
+                Failed to load related compounds
             </div>
         `;
         countBadge.textContent = '0';
@@ -235,7 +238,7 @@ async function loadCompoundsData() {
 }
 
 /**
- * 显示相关化合物
+ * Display related compounds
  */
 function displayCompounds(compounds) {
     const container = document.getElementById('compoundsContainer');
@@ -245,7 +248,7 @@ function displayCompounds(compounds) {
         container.innerHTML = `
             <div class="text-center text-muted py-4">
                 <i class="fas fa-info-circle fa-2x mb-3"></i>
-                <p>暂无相关化合物数据</p>
+                <p>No related compounds data available</p>
             </div>
         `;
         countBadge.textContent = '0';
@@ -254,11 +257,11 @@ function displayCompounds(compounds) {
     
     countBadge.textContent = compounds.length;
     
-    // 按得分排序并取前20个
+    // Sort by score and take top 20
     const sortedCompounds = compounds.sort((a, b) => (b.score || 0) - (a.score || 0));
     const displayCompounds = sortedCompounds.slice(0, 20);
     
-    // 生成化合物列表HTML
+    // Generate compounds list HTML
     let compoundsHtml = displayCompounds.map(compound => {
         const score = compound.score || 0;
         const scoreClass = score >= 0.95 ? 'success' : score >= 0.90 ? 'warning' : 'secondary';
@@ -275,8 +278,8 @@ function displayCompounds(compounds) {
                             </a>
                         </h6>
                         <small class="text-muted">
-                            类型: ${compound.compound_type || 'N/A'}
-                            ${compound.molecular_formula ? ` • 分子式: ${compound.molecular_formula}` : ''}
+                            Type: ${compound.compound_type || 'N/A'}
+                            ${compound.molecular_formula ? ` • Formula: ${compound.molecular_formula}` : ''}
                         </small>
                     </div>
                     <div class="text-end">
@@ -289,12 +292,12 @@ function displayCompounds(compounds) {
         `;
     }).join('');
     
-    // 如果有更多化合物，添加查看全部提示
+    // Add "show more" note if there are more compounds
     if (sortedCompounds.length > 20) {
         compoundsHtml += `
             <div class="text-center mt-3">
                 <small class="text-muted">
-                    显示前20个高得分化合物，共${sortedCompounds.length}个化合物
+                    Showing top 20 high-scoring compounds of ${sortedCompounds.length} total compounds
                 </small>
             </div>
         `;

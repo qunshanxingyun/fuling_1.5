@@ -99,3 +99,16 @@ class CompoundService:
     def get_statistics(self) -> Dict:
         """获取统计信息"""
         return self.compound_model.get_statistics()
+    
+    def count(self, filters: Optional[Dict] = None, search: Optional[str] = None) -> int:
+        """
+        Get total count of compounds matching criteria
+        
+        Args:
+            filters: Filter conditions
+            search: Search keyword
+            
+        Returns:
+            int: Total count
+        """
+        return self.compound_model.count(filters=filters, search=search)

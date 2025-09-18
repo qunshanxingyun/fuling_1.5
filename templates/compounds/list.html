@@ -1,21 +1,21 @@
 {% extends "base/base.html" %}
 
-{% block title %}化合物列表 - 茯苓靶点预测数据库{% endblock %}
+{% block title %}Compounds Database - Poria Cocos Target Prediction Database{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
-    <!-- 页面标题 -->
+    <!-- Page Header -->
     <div class="row mb-4">
         <div class="col-12">
             <h1 class="display-6 mb-3">
-                <i class="fas fa-atom text-primary me-2"></i>茯苓化合物数据库
+                <i class="fas fa-atom text-primary me-2"></i>Poria Cocos Compounds Database
             </h1>
-            <p class="text-muted">共收录 {{ stats.total if stats else 151 }} 个活性化合物</p>
+            <p class="text-muted">Total of {{ stats.total if stats else 151 }} active compounds</p>
         </div>
     </div>
 
     {% if error %}
-    <!-- 错误信息 -->
+    <!-- Error Message -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="alert alert-danger">
@@ -25,25 +25,26 @@
     </div>
     {% endif %}
 
-    <!-- 简单筛选工具栏 -->
+    <!-- Filter Toolbar -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-md-4">
-                            <label for="typeFilter" class="form-label">化合物类型</label>
+                            <label for="typeFilter" class="form-label">Compound Type</label>
                             <select class="form-select" id="typeFilter">
-                                <option value="all">全部类型</option>
-                                <option value="挥发油">挥发油类</option>
-                                <option value="三萜">三萜类</option>
-                                <option value="甾醇">甾醇类</option>
+                                <option value="all">All Types</option>
+                                <option value="挥发油">Essential Oils</option>
+                                <option value="三萜">Triterpenes</option>
+                                <option value="甾醇">Sterols</option>
                             </select>
                         </div>
                         <div class="col-md-8">
-                            <label for="searchInput" class="form-label">搜索</label>
+                            <label for="searchInput" class="form-label">Search</label>
                             <input type="text" class="form-control" id="searchInput" 
-                                   placeholder="输入化合物名称或分子式..." value="{{ search or '' }}">
+                                   placeholder="Enter compound name or molecular formula..." 
+                                   value="{{ search or '' }}">
                         </div>
                     </div>
                 </div>
@@ -51,7 +52,7 @@
         </div>
     </div>
 
-    <!-- 化合物数据表格 -->
+    <!-- Compounds Data Table -->
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -60,12 +61,12 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>中文名</th>
-                                <th>英文名</th>
-                                <th>类型</th>
-                                <th>分子式</th>
-                                <th>分子量</th>
-                                <th>操作</th>
+                                <th>Chinese Name</th>
+                                <th>English Name</th>
+                                <th>Type</th>
+                                <th>Molecular Formula</th>
+                                <th>Molecular Weight</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -81,7 +82,7 @@
 
 {% block extra_js %}
 <script>
-// 页面配置传递给JavaScript
+// Page configuration for JavaScript
 window.pageConfig = {
     compoundType: '{{ compound_type or "all" }}',
     searchQuery: '{{ search or "" }}'
