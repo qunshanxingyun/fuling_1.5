@@ -58,8 +58,8 @@ class TargetService:
                     search: Optional[str] = None,
                     sort_by: str = 'prediction_count',
                     sort_order: str = 'desc') -> Dict:
-        """Enhanced targets list with proper data loading"""
-        # Get all unique targets with enhanced data processing
+        """Enhanced targets list with FIXED column naming"""
+        # Get all unique targets
         targets_df = self.target_model.get_all_unique_targets()
         
         if targets_df.empty:
@@ -73,15 +73,45 @@ class TargetService:
                 }
             }
         
-        # Debug: Print columns to see what data we have
-        print(f"DEBUG: Available columns: {targets_df.columns.tolist()}")
-        print(f"DEBUG: Sample data shape: {targets_df.shape}")
+        # CRITICAL FIX: Clean up duplicate column names from merge
+        column_rename_map = {}
+        
+        # Handle duplicate columns from pandas merge
+        if 'prediction_count_x' in targets_df.columns:
+            # Use the aggregated prediction count (_x) which is from our calculation
+            targets_df['prediction_count'] = targets_df['prediction_count_x']
+            column_rename_map['prediction_count_x'] = 'prediction_count'
+            
+        if 'avg_score_x' in targets_df.columns:
+            # Use the aggregated average score (_x) which is from our calculation  
+            targets_df['avg_score'] = targets_df['avg_score_x']
+            column_rename_map['avg_score_x'] = 'avg_score'
+            
+        if 'compound_count_x' in targets_df.columns:
+            # Use the aggregated compound count (_x) which is from our calculation
+            targets_df['compound_count'] = targets_df['compound_count_x']
+            column_rename_map['compound_count_x'] = 'compound_count'
+        
+        # Remove duplicate columns to avoid confusion
+        columns_to_drop = []
+        for col in targets_df.columns:
+            if col.endswith('_y') and col.replace('_y', '') in targets_df.columns:
+                columns_to_drop.append(col)
+            elif col.endswith('_x') and col.replace('_x', '') in targets_df.columns:
+                columns_to_drop.append(col)
+        
+        if columns_to_drop:
+            targets_df = targets_df.drop(columns=columns_to_drop)
+        
+        # Debug: Print cleaned columns
+        print(f"DEBUG: Cleaned columns: {targets_df.columns.tolist()}")
         if not targets_df.empty:
-            print(f"DEBUG: First row sample: {targets_df.iloc[0].to_dict()}")
+            sample_row = targets_df.iloc[0]
+            print(f"DEBUG: prediction_count = {sample_row.get('prediction_count', 'MISSING')}")
+            print(f"DEBUG: avg_score = {sample_row.get('avg_score', 'MISSING')}")
         
         # Apply search
         if search:
-            # Search in multiple fields with case-insensitive matching
             mask = pd.Series([False] * len(targets_df))
             search_fields = ['gene_name', 'gene_symbol', 'protein_names', 'function_cc', 'uniprot_id']
             
@@ -97,53 +127,66 @@ class TargetService:
             if col in targets_df.columns:
                 targets_df[col] = pd.to_numeric(targets_df[col], errors='coerce').fillna(0)
         
-        # Apply sorting
+        # Apply sorting with proper column names
         if sort_by in targets_df.columns:
             ascending = (sort_order == 'asc')
             targets_df = targets_df.sort_values(by=sort_by, ascending=ascending)
+        else:
+            # Fallback sorting
+            if 'prediction_count' in targets_df.columns:
+                targets_df = targets_df.sort_values(by='prediction_count', ascending=False)
         
         # Apply pagination
         paginated_df, pagination_info = self.paginator.paginate_dataframe(
             targets_df, page, page_size
         )
         
-        # Select and prepare display columns
+        # Select display columns - using cleaned column names
         display_columns = [
-            'gene_name', 'gene_symbol', 'species', 'prediction_count',
-            'compound_count', 'avg_score', 'max_score', 'min_score',
-            'uniprot_id', 'protein_names', 'function_cc'
+            'gene_name', 'gene_symbol', 'prediction_count', 'avg_score', 
+            'uniprot_id', 'protein_names', 'function_cc', 'compound_count'
         ]
         
-        # Ensure columns exist and prepare data
-        available_columns = [col for col in display_columns if col in paginated_df.columns]
-        
-        # Convert to dictionary list with enhanced data formatting
+        # Convert to dictionary list with proper data handling
         items = []
         for _, row in paginated_df.iterrows():
             item = {}
-            for col in available_columns:
-                value = row[col]
-                
-                # Handle NaN and None values
-                if pd.isna(value) or value is None:
-                    if col in numeric_columns:
+            for col in display_columns:
+                if col in row.index:
+                    value = row[col]
+                    
+                    # Handle NaN and None values
+                    if pd.isna(value) or value is None:
+                        if col in ['prediction_count', 'compound_count']:
+                            item[col] = 0
+                        elif col in ['avg_score']:
+                            item[col] = 0.0
+                        else:
+                            item[col] = ''
+                    else:
+                        # Format values properly
+                        if col in ['avg_score'] and value != 0:
+                            item[col] = float(value)
+                        elif col in ['prediction_count', 'compound_count']:
+                            item[col] = int(value) if value != 0 else 0
+                        else:
+                            item[col] = str(value) if value else ''
+                else:
+                    # Column missing, set default
+                    if col in ['prediction_count', 'compound_count']:
                         item[col] = 0
+                    elif col in ['avg_score']:
+                        item[col] = 0.0
                     else:
                         item[col] = ''
-                else:
-                    # Format numeric values
-                    if col in ['avg_score', 'max_score', 'min_score'] and value != 0:
-                        item[col] = float(value)
-                    elif col in ['prediction_count', 'compound_count']:
-                        item[col] = int(value) if value != 0 else 0
-                    else:
-                        item[col] = str(value) if value else ''
             
-            # Ensure minimum required fields exist
+            # Ensure minimum required fields
             if 'gene_name' not in item or not item['gene_name']:
                 item['gene_name'] = item.get('gene_symbol', 'Unknown')
             
             items.append(item)
+        
+        print(f"DEBUG: Sample processed item: {items[0] if items else 'No items'}")
         
         return {
             'items': items,

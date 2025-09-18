@@ -87,10 +87,10 @@ class Target:
         return enriched_df
     
     def get_all_unique_targets(self) -> pd.DataFrame:
-        """获取所有独特的靶点（用于构建靶点列表）"""
+        """Enhanced: Get all unique targets with proper column handling"""
         all_targets = []
         
-        # 从所有预测文件中收集靶点
+        # From all prediction files collect targets
         for compound_type, dir_path in self.prediction_dirs.items():
             if os.path.exists(dir_path):
                 for file in os.listdir(dir_path):
@@ -100,8 +100,13 @@ class Target:
                             if not df.empty and 'From' in df.columns:
                                 df['source_type'] = compound_type
                                 df['source_file'] = file
-                                # 添加标准化的基因符号
+                                # Add standardized gene_symbol
                                 df['gene_symbol'] = df['From'].apply(self._get_gene_symbol_from_name)
+                                
+                                # Ensure score column is numeric
+                                if 'score' in df.columns:
+                                    df['score'] = pd.to_numeric(df['score'], errors='coerce')
+                                
                                 all_targets.append(df)
                         except Exception as e:
                             print(f"Error reading {file}: {str(e)}")
@@ -110,31 +115,82 @@ class Target:
         if all_targets:
             combined_df = pd.concat(all_targets, ignore_index=True)
             
-            # 按基因符号分组，计算统计信息
-            # 只处理成功映射到gene_symbol的记录
+            # Only process records with valid gene_symbol
             valid_targets = combined_df[combined_df['gene_symbol'].notna()]
             
+            if valid_targets.empty:
+                return pd.DataFrame()
+            
+            # Group by gene_symbol and calculate statistics
             target_stats = valid_targets.groupby('gene_symbol').agg({
                 'score': ['mean', 'max', 'min', 'count'],
                 'source_type': lambda x: list(set(x)),
-                'source_file': 'count',
-                'From': 'first'  # 保留原始的From值
+                'source_file': 'nunique',  # Number of unique compounds
+                'From': 'first'  # Keep original From value
             }).reset_index()
             
-            # 展平多级列名
-            target_stats.columns = ['gene_symbol', 'avg_score', 'max_score', 
-                                   'min_score', 'prediction_count', 
-                                   'compound_types', 'compound_count', 'from_name']
+            # Flatten multi-level columns with clean names
+            target_stats.columns = [
+                'gene_symbol', 'avg_score', 'max_score', 'min_score', 
+                'prediction_count', 'compound_types', 'compound_count', 'from_name'
+            ]
             
-            # 如果有基础信息，进行合并
+            # Clean up data types
+            numeric_cols = ['avg_score', 'max_score', 'min_score', 'prediction_count', 'compound_count']
+            for col in numeric_cols:
+                target_stats[col] = pd.to_numeric(target_stats[col], errors='coerce').fillna(0)
+            
+            # CRITICAL FIX: Merge with base target info using suffixes to avoid conflicts
             if not self._targets_df.empty:
-                # 使用gene_symbol作为连接键
+                # Prepare base dataframe columns to avoid conflicts
+                base_df = self._targets_df.copy()
+                
+                # Only keep essential columns from base data to avoid conflicts
+                base_essential_cols = [
+                    'gene_symbol', 'gene_name', 'species', 'uniprot_id', 
+                    'protein_names', 'function_cc', 'subcellular_location_cc'
+                ]
+                
+                # Filter to only existing columns
+                base_available_cols = [col for col in base_essential_cols if col in base_df.columns]
+                base_df = base_df[base_available_cols]
+                
+                # Merge WITHOUT creating duplicate columns
                 target_stats = pd.merge(
                     target_stats, 
-                    self._targets_df, 
+                    base_df, 
                     on='gene_symbol', 
-                    how='left'
+                    how='left',
+                    suffixes=('', '_base')  # Our calculated data gets no suffix, base data gets _base
                 )
+                
+                # Fill missing gene_name with gene_symbol
+                if 'gene_name' not in target_stats.columns:
+                    target_stats['gene_name'] = target_stats['gene_symbol']
+                else:
+                    target_stats['gene_name'] = target_stats['gene_name'].fillna(target_stats['gene_symbol'])
+            else:
+                # If no base info, create essential columns
+                target_stats['gene_name'] = target_stats['gene_symbol']
+                target_stats['species'] = 'Homo sapiens'
+            
+            # Ensure all required columns exist with proper defaults
+            required_columns = {
+                'uniprot_id': '',
+                'protein_names': '',
+                'function_cc': '',
+                'species': 'Homo sapiens'
+            }
+            
+            for col, default_val in required_columns.items():
+                if col not in target_stats.columns:
+                    target_stats[col] = default_val
+                else:
+                    # Fill NaN values with defaults
+                    target_stats[col] = target_stats[col].fillna(default_val)
+            
+            print(f"DEBUG: Final columns after merge: {target_stats.columns.tolist()}")
+            print(f"DEBUG: Sample merged data: prediction_count = {target_stats.iloc[0]['prediction_count'] if not target_stats.empty else 'NO DATA'}")
             
             return target_stats
         
